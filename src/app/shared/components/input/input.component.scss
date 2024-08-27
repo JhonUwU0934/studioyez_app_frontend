@@ -1,0 +1,118 @@
+@import '../../../../styles.scss';
+
+:host {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+
+    .label {
+        display: flex;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-text);
+    }
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form__field {
+    display: flex;
+    box-shadow: 0 0 5px var(--box-label-input);
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    height: 35px;
+    position: relative;
+
+    .input {
+        width: 100%;
+        padding: 10px;
+        background-color: var(--sidebar-color-fondo);
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 5px;
+        border: none;
+        font-size: $small-font-size;
+        opacity: .9;
+        outline: none;
+        color: var(--color-text-input);
+        font-weight: 600;
+
+        &::-webkit-calendar-picker-indicator {
+            // filter: invert(1);
+        }
+
+        // &:focus {
+        //     color: var(--color-text);
+        // }
+
+        &::placeholder {
+            color: var(--color-text);
+            font-weight: 100;
+            opacity: .7;
+        }
+    }
+
+    .input-error{
+        border: red 1px solid;
+    }
+
+    .error-icon{
+        position: absolute;
+        font-size: 12px;
+        right: 3px;
+        color: red;
+    }
+
+
+    .label-izq {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        background-color: var(--fondo-label-input);
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 5px;
+    }
+
+    label {
+        svg {
+            font-size: 12px;
+            color: var(--color-text);
+        }
+    }
+
+    .label-der {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        cursor: pointer;
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+
+}
+
+
+.text-danger {
+    width: 100%;
+    color: var(--primary-color-neutro);
+    font-size: 12px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 7px 10px;
+    background-color: #F8D7DA;
+    border-radius: 4px;
+}
+

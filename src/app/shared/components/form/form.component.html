@@ -1,0 +1,150 @@
+<form [formGroup]="myForm" (ngSubmit)="onSubmit()"  >
+  
+
+
+   <div class="form_header">
+
+    <!-- <div class="form_img">
+      <img src="https://i.ibb.co/NS04wpf/pngegg-2.png" alt="">
+    </div> -->
+
+    <div class="form_title" *ngIf="arrayForm.title">
+      <h2>{{arrayForm.title}}</h2>
+    </div>
+
+
+    <div class="form_text" *ngIf="arrayForm.text">
+      <p>{{arrayForm.text}}</p>
+    </div>
+
+   </div>
+
+ 
+   <div class="form_body" *ngIf="arrayForm.selects">
+    <ng-container *ngFor="let item of arrayForm.selects">
+
+    <div class="form_input_container">
+      
+      <div class="form__field">
+          <label class="label-izq">
+              <span><i [class]="item.icon"></i></span>
+          </label>
+          <select name="select" [formControlName]="item.controlName">
+              <option value="" hidden>{{item.placeholder}}</option>
+              <option name="select" *ngFor="let options of item.selects" [value]="options.value">{{options.name}}</option>
+          </select>
+          <div class="select-arrow">
+              <div class="arrow-down"></div>
+          </div>
+          
+          <label class="label-der">
+          </label>
+      </div>
+
+    </div>
+    
+    </ng-container>
+  </div>
+   
+
+    <div class="form_body" *ngIf="arrayForm.inputs">
+      <ng-container *ngFor="let item of arrayForm.inputs">
+
+       <div class="form_input_container">
+        <div class="form__field">
+          <label class="label-izq">
+            <span><i [class]="item.icon"></i></span>
+          </label>
+
+
+          <input [formControlName]="item.formcontrolName" 
+          [type]="item.type"  
+          [name]="item.name" 
+          required  
+          [placeholder]="item.placeholder"
+          class="input"
+          [type]="item.type === 'password' ? (item.isEyeChange ? 'text' : 'password') : item.type">
+
+          <label (click)="eyeChange(item)" class="label-der">
+            <span [hidden] = "item.isEyeChange"  *ngIf="item.type === 'password'" ><i class="fa-regular fa-eye"></i></span>
+            <span [hidden] = "!item.isEyeChange"  *ngIf="item.type === 'password'" ><i class="fa-regular fa-eye-slash"></i></span>
+          </label>
+        </div>
+          
+        <div 
+          *ngIf="myForm.get(item.formcontrolName)?.dirty && myForm.get(item.formcontrolName)?.errors?.['required']"
+          class="text-danger">
+          <i class="fa-solid fa-circle-exclamation"></i> 
+          El {{item.placeholder}} es requerido.
+        </div>
+
+        <ng-container *ngIf="item.type === 'password' && item.formcontrolName === 'contraseña' && arrayForm.twoPassword">
+          <div  style="font-size: 13px;"
+            *ngIf="myForm.get(item.formcontrolName)?.dirty &&
+                    (myForm.get(item.formcontrolName)?.errors?.['minlength'] || 
+                    myForm.get(item.formcontrolName)?.errors?.['pattern'])">
+                    Recuerda que la contraseña debe tener
+                    
+                    <div
+                    *ngFor="let items of item.validations"
+                    [ngClass]="
+                    myForm.get(item.formcontrolName)?.errors?.['required'] ||
+                    myForm.get(item.formcontrolName)?.errors?.[items.validErrors] ? 'validator-danger' : 'validator-success' ">
+                    <span [hidden]="!(myForm.get(item.formcontrolName)?.errors?.['required']
+                        || myForm.get(item.formcontrolName)?.errors?.[items.validErrors])">
+                      <i class="fa-solid fa-circle-xmark"></i>
+                    </span>
+                    <span [hidden]="(myForm.get(item.formcontrolName)?.errors?.['required']
+                            || myForm.get(item.formcontrolName)?.errors?.[items.validErrors])">
+                      <i class="fa-solid fa-circle-check"></i>
+                    </span>
+                      {{items.descriptErrors}}
+                    </div>
+          </div>
+        </ng-container>
+  
+        <ng-container *ngIf="item.type === 'password' && item.formcontrolName === 'contraseña_two'">
+          <div class="text-danger" *ngIf="myForm.get(item.formcontrolName)?.dirty
+            && myForm.errors?.['valuesDoNotMatch']
+            && !(myForm.get(item.formcontrolName)?.errors?.['required'])">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            Los campos de contraseña no coinciden
+          </div>
+        </ng-container>
+        
+       </div>
+
+      </ng-container>
+    </div>
+
+  
+    <div class="form_body" *ngIf="arrayForm.checks">
+      <ng-container *ngFor="let item of arrayForm.checks">
+  
+      <div class="form_input_check">
+      
+        <input [formControlName]="item.formcontrolName" type="checkbox">
+        <label for="">{{item.label}}</label>
+  
+      </div>
+      
+      </ng-container>
+    </div>
+
+    
+      
+    <div class="form_buttons" *ngIf="arrayForm.buttonText">
+      <app-button [label]="arrayForm.buttonText" [myForm]="myForm"></app-button>
+    </div>
+
+    <div class="form_recovery" *ngIf="arrayForm.forgotPassword">
+      <a (click)="arrayForm.onRecovery()">
+        ¿Olvidaste tu contraseña?
+      </a>
+    </div>
+
+</form>
+
+
+
+

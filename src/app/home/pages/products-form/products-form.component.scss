@@ -1,0 +1,119 @@
+@import '../../../../styles.scss';
+
+
+.container {
+    // padding: 50px 65px;
+    // display: flex;
+    // align-items: center;
+    // gap: 45px;
+
+    .back{
+        color: var(--color-text);
+        font-size: $medium-font-size-title;
+        cursor: pointer;
+    }
+
+    .home_title {
+        font-size: $base-font-size;
+        color: var(--color-text);
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .container-left {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        // justify-content: center;
+   
+        .page {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+
+            .form_header {
+
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                color: var(--color-text);
+
+                .form_img {
+                    display: flex;
+                    justify-content: center;
+
+                    img {
+                        width: 80px;
+                        // border-radius: 50%;
+                    }
+
+                    svg {
+                        font-size: 35px;
+                        color: var(--primary-color-neutro);
+                    }
+                }
+
+                .form_title {
+                    display: flex;
+                    // justify-content: center;
+
+                    h2 {
+                        font-size: $medium-large-font-size;
+                        // text-align: center;
+                        line-height: 30px;
+                    }
+
+                }
+
+                p {
+                    font-size: $small-font-size;
+                    text-align: center;
+                }
+
+                .form_img {
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                }
+
+            }
+
+            .form-button{
+                display: flex;
+                align-self: flex-start;
+                gap: 10px;
+            }
+
+        }
+    }
+
+
+}
+
+.content-inputs{
+    display: flex;
+    gap: 40px;
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+
+        .requirements {
+            width: 100%;
+            padding: 0;
+
+        }
+
+        .page {
+            width: 100%;
+            padding: 10px 10px;
+            border-left: none;
+
+        }
+    }
+}

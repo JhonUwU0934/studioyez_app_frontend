@@ -1,0 +1,24 @@
+<div id="capa" class="modal" *ngIf="modalArray.viewModal">
+    <div #container class="modal-content">
+        <div class="modal-header">
+            <span id="close-modal" (click)="modalArray.viewModal=false">&times;</span>
+        <div class="contenedor">
+            <span class="tit">
+                <i class="fa-solid fa-file-pen"></i>
+            </span>
+            <h3 class="tit">Editar</h3>
+        </div>
+        </div>
+        <div class="modal-body">
+            <h5>Ingresa el nuevo monto:</h5>
+            <div>
+                <input type="text" [(ngModel)]="modalArray.newAmount" appFormatoNumerico >
+            </div>
+        </div>
+        <div class="modal-boton-container">
+            <div  class="modal-boton">
+                <input type="button" (click)="modalArray.onMethod()" class="css-button-shadow-border--red" value="Ingresar">
+            </div>
+        </div>
+    </div>
+</div>

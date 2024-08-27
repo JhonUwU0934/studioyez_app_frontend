@@ -1,0 +1,208 @@
+@import '../../../../styles.scss';
+
+// background-color: #fff;
+// background-color: var(--sidebar-color-fondo);
+// color: var(--color-text);
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: 101;
+    padding: 10px 0;
+
+
+    .modal-content {
+        margin: 40vh auto;
+        max-width: 300px;
+        background-color: #fff;
+        // background-color: var(--sidebar-color-fondo);
+        // color: var(--color-text);
+        padding: 20px;
+
+        border-radius: 10px;
+        box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.02),
+            22.3px 22.3px 17.9px rgba(0, 0, 0, 0.03),
+            100px 100px 80px rgba(0, 0, 0, 0.05);
+        // animation: flash .5s ease;
+        animation: pulse .3s ease;
+
+
+
+        // animation: slide-top 0.6s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+        // animation-fill-mode: forwards;
+        // animation-duration: 0.5s;
+
+        .modal-header {
+            border-bottom: solid 1px #bbb8b8;
+        }
+
+        .contenedor {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding-bottom: 5px;
+            height: 35px;
+
+            span {
+                svg {
+                    font-size: 24px;
+                    // color: rgb(241, 40, 40);
+                }
+            }
+        }
+
+        .tit {
+            font-size: $medium-font-size-title;
+            color: var(--primary-color-neutro);
+        }
+
+        #close-modal {
+            float: right;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        img {
+            width: 30px;
+        }
+
+        ;
+    }
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+
+    h5{
+        font-size: $small-font-size;
+        color: var(--color-text-neutro);
+    }
+
+    #messa {
+        font-size: 15px;
+        margin: 15px 0;
+        text-align: left;
+        line-height: 18px;
+    }
+
+    input {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid var(--border-color);
+        font-size: $small-font-size;
+        outline: none;
+        color: var(--color-text-neutro);
+    }
+}
+
+.modal-boton-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-boton {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.css-button-shadow-border--red {
+    color: #fff;
+    padding: 5px 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+    outline: none;
+    border-radius: 5px;
+    border: none;
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5), 7px 7px 20px 0px rgba(0, 0, 0, .1), 4px 4px 5px 0px rgba(0, 0, 0, .1);
+    background: var(--primary-color-neutro);
+}
+
+.css-button-shadow-border--red:hover {
+    background-color: var(--primary-color-neutro);
+}
+
+.css-button-shadow-border--red:active {
+    top: 2px;
+}
+
+.loader {
+    text-align: center;
+}
+
+
+@keyframes slide-top {
+    0% {
+        -webkit-transform: translateY(100px);
+        transform: translateY(100px);
+        -moz-transform: translateY(100px);
+        -ms-transform: translateY(100px);
+        -o-transform: translateY(100px);
+    }
+
+    100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+        -moz-transform: translateY(0);
+        -ms-transform: translateY(0);
+        -o-transform: translateY(0);
+    }
+}
+
+.flash {
+    animation: flash 500ms ease infinite alternate;
+}
+
+@keyframes flash {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.pulse {
+    animation: pulse 1s ease-in-out alternate;
+
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(.98);
+        -webkit-transform: scale(.98);
+        -moz-transform: scale(.98);
+        -ms-transform: scale(.98);
+        -o-transform: scale(.98);
+    }
+
+    to {
+        transform: scale(1.03);
+        -webkit-transform: scale(1.03);
+        -moz-transform: scale(1.03);
+        -ms-transform: scale(1.03);
+        -o-transform: scale(1.03);
+    }
+}
+
+
+.red {
+    color: rgb(241, 40, 40);
+}
+
+.green {
+    color: #70cf70;
+}
+

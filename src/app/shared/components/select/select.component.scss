@@ -1,0 +1,94 @@
+@import '../../../../styles.scss';
+
+.content-input {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .label {
+        display: flex;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--color-text);
+    }
+
+    .form__field {
+        position: relative;
+        display: flex;
+        box-shadow: 0 0 5px var(--box-label-input);
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 5px;
+        height: 35px;
+
+        select {
+            appearance: none;
+            width: 100%;
+            padding: 10px;
+            background-color: var(--sidebar-color-fondo);
+            border-bottom-right-radius: 5px;
+            border-top-right-radius: 5px;
+            border: none;
+            font-size: $small-font-size;
+            opacity: .6;
+            outline: none;
+            color: var(--color-text);
+
+            &::-ms-expand {
+                display: none;
+            }
+        }
+
+        .select-arrow {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 15px 12px;
+            pointer-events: none;
+
+            .arrow-down {
+                width: 0;
+                height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 6px solid var(--color-text);
+            }
+        }
+
+        .label-izq {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            background-color: var(--fondo-label-input);
+            border-bottom-left-radius: 5px;
+            border-top-left-radius: 5px;
+        }
+
+        label {
+            svg {
+                font-size: 12px;
+                color: var(--color-text);
+            }
+        }
+
+    }
+}
+
+
+
+
+.text-danger {
+    width: 100%;
+    color: var(--primary-color-neutro);
+    font-size: 12px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 7px 10px;
+    background-color: #F8D7DA;
+    border-radius: 4px;
+}

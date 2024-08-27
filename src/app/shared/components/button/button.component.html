@@ -1,0 +1,8 @@
+<button  
+[class.loading]="load_spinner" 
+(click)="changeStateButton()"
+type="submit" 
+class="action-btn"
+[disabled]="myForm.invalid">
+         {{label}}
+</button>

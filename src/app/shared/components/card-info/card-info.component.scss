@@ -1,0 +1,99 @@
+
+@import '../../../../styles.scss';
+
+.card-container {
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--sidebar-color-fondo);
+    box-shadow: 0 8px 4px #0000000a, 0 0 4px #00000040;
+    border-radius: 5px;
+    cursor: pointer;
+
+    .container-card{
+
+        height: 100px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 10px 20px 10px 20px;
+
+
+
+        svg{
+            font-size: 40px;
+        }
+    
+        .card_body{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            p{
+                color: var(--color-text);
+    
+                &:nth-child(1){
+                    font-size: $base-font-size;
+                    font-weight: 600;
+                }
+    
+                &:nth-child(2){
+                    font-size: $small-font-size;
+                    line-height: 14px;
+                }
+            }
+    
+        }
+
+    }
+
+    .footer {
+        width: 100%;
+        padding: 5px;
+        text-align: center;
+        background-color: var(--fondo-label-input);
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+
+        span {
+            font-size: $small-font-size;
+            color: var(--color-text);
+            font-weight: 600;
+        }
+    }
+}
+
+
+
+.css-button-arrow--red {
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+    outline: none;
+    overflow: hidden;
+    border: none;
+    background-color: transparent;
+    font-size: $small-font-size;
+    color: var(--color-text);
+  }
+  .css-button-arrow--red:hover {
+    border-radius: 5px;
+    padding-right: 24px;
+  }
+  .css-button-arrow--red:hover:after {
+    opacity: 1;
+    right: 5px;
+  }
+  .css-button-arrow--red:after {
+    content: "\00BB";
+    position: absolute;
+    opacity: 0;
+    font-size: 15px;
+    line-height: 39px;
+    top: -13px;
+    right: -20px;
+    transition: 0.4s;
+  }

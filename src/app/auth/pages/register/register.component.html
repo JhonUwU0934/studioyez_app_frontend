@@ -1,0 +1,9 @@
+<section class="contenedor">
+
+    <div class="form_container">
+        <app-form [arrayForm]="arrayForm" (formDataEvent)="formContact($event)"></app-form>
+
+        <span>Ya tienes una cuenta?<a routerLink="/auth/login" class=""> Inicia sesión</a></span>
+    </div>
+
+</section>

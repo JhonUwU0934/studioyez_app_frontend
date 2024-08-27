@@ -1,0 +1,58 @@
+<div class="container">
+
+    <div class="products-header">
+
+        <div class="products-header_pruduct">
+            <span><i class="fa-solid fa-right-from-bracket"></i></span>
+            <p>Registro de gastos</p>
+            <p>Ingresa y edita las gastos</p>
+        </div>
+
+    </div>
+
+    <div>
+        <div class="product-movements">
+            <app-button-click label="Generar Gasto" [buttonMethod]="doSomething"></app-button-click>
+
+            <div class="input-content">
+                <label class="label" for="busqueda">Buscar:</label>
+                <input class="input" type="date" id="busqueda" [(ngModel)]="search" placeholder="Ingresa el codigo de factura">
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Monto</th>
+                            <th>Fecha</th>
+                            <th>Editar</th>
+    
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let data of (data.data | searchSale:'fecha': search  | paginate: { itemsPerPage: 5, currentPage: p })">
+                        <tr>
+                            <td><span><i class="fa-solid fa-hashtag"></i></span> <span>{{data.descripcion}}</span></td>
+                            <td>{{data.monto | customNumber}}</td>
+                            <td>{{data.fecha}}</td>
+                            <td routerLink="/home/gastos-form/{{data.id}}" style="color: var(--secondary-color-1); font-size: 18px; cursor: pointer;"><i class="fa-regular fa-pen-to-square"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pagination-controls 
+            class="my-pagination"
+            [directionLinks]="false"
+            (pageChange)="p = $event" 
+            previousLabel="Anterior"
+            nextLabel="Siguiente"  
+            [maxSize]="5" 
+            [responsive]="true"
+            ></pagination-controls>
+
+        </div>
+
+    </div>
+
+</div>

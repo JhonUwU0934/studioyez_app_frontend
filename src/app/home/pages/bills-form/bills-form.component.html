@@ -1,0 +1,38 @@
+<div class="container">
+
+    <div class="container-left">
+        <span (click)="doSomething()" class="back">
+            <i class="fa-solid fa-arrow-left"></i>
+        </span>
+        <form (ngSubmit)="getSubmit()" [formGroup]="billForm" class="page slide-page flash">
+
+            <div class="form_header">
+                <div class="form_title">
+                    <h2>Agregar Gasto</h2>
+                </div>
+            </div>
+
+           <div class="content-inputs">
+        
+            <app-input [form]="billForm" [arrayInput]="arrayInput3">
+            </app-input>
+                 
+            <div class="content-msg">
+                <label class="label" for="">Descripción</label>
+                <div class="msg">
+                    <textarea spellcheck="false" formControlName="description" required cols="20" rows="3"
+                        placeholder="Mensaje"></textarea>
+                </div>
+            </div>
+
+           </div>
+
+            <div class="form-button">
+                <app-button [label]="'Guardar'" [myForm]="billForm"></app-button>
+                <!-- <app-button-click [label]="'Ver todas'" [buttonMethod]="doSomething"></app-button-click> -->
+            </div>
+
+        </form>
+    </div>
+</div>
+

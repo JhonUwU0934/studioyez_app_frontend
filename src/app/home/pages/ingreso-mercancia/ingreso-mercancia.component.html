@@ -1,0 +1,60 @@
+<div class="container">
+
+    <div class="products-header">
+
+
+
+        <div class="products-header_pruduct">
+            <span><i class="fa-solid fa-right-left icon"></i></span>
+            <p>Ingreso de mercancia</p>
+            <p>Gestion de ingreso de mercancía PRODUCTOS EXISTENTES</p>
+        </div>
+
+    </div>
+
+    <div>
+        <div class="product-movements">
+            <app-button-click label="Ingresar mercancía" [buttonMethod]="doSomething"></app-button-click>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>producto_id</th>
+                            <th>código de producto</th>
+                            <th>fecha</th>
+                            <th>cantidad_de_ingreso</th>
+                            <th>created_at</th>
+                            <th>updated_at</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let data of (data.data | searchSale:'codigo': search  | paginate: { itemsPerPage: 5, currentPage: p })">
+                        <tr>
+                            <td>{{data.producto_id}}</td>
+                            <td>{{data.codigo}}</td>
+                            <td>{{data.fecha}}</td>
+                            <td>{{data.cantidad_de_ingreso}}</td>
+                            <td>{{data.created_at}}</td>
+                            <td>{{data.updated_at}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pagination-controls
+            class="my-pagination"
+            [directionLinks]="false"
+            (pageChange)="p = $event"
+            previousLabel="Anterior"
+            nextLabel="Siguiente"
+            [maxSize]="5"
+            [responsive]="true"
+            ></pagination-controls>
+
+
+        </div>
+
+    </div>
+
+</div>

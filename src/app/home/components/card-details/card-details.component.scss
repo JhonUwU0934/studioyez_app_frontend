@@ -1,0 +1,65 @@
+@import '../../../../styles.scss';
+
+.internal_details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: var(--sidebar-color-fondo);
+    box-shadow: 0 8px 4px rgba(0, 0, 0, 0.0392156863), 0 0 4px rgba(0, 0, 0, 0.2509803922);
+    border-radius: 5px;
+    padding: 25px 25px 35px 25px;
+
+    .home_title {
+        font-size: $base-font-size;
+        color: var(--color-text);
+        font-weight: 600;
+        padding-left: 10px;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 0;
+    
+        thead {
+            th {
+                text-align: left;
+                border-bottom: 1px solid var(--border-color);
+            }
+        }
+    
+        tbody {
+            td {
+                border-bottom: 1px solid var(--border-color);
+                font-weight: normal;
+                line-height: 20px;
+            }
+            tr:last-child {
+                td {
+                    border-bottom: none;
+                }
+            }
+        }
+    
+        td,
+        th {
+            padding: 10px 10px;
+            color: var(--color-text);
+            font-size: $small-font-size;
+            span {
+                margin-right: 15px;
+    
+                &:nth-child(1) {
+                    font-weight: 100;
+                    color: rgb(181, 215, 124);
+                }
+    
+                &:nth-child(2) {
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+
+}

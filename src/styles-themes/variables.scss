@@ -1,0 +1,78 @@
+/* ====== Transition ====== */
+$tran-01: all 0.1s ease;
+$tran-02: all 0.2s ease;
+$tran-03: all 0.3s ease;
+$tran-04: all 0.4s ease;
+$tran-05: all 0.5s ease;
+
+/*Font Size*/
+
+$base-font-size: 1rem; // 1 rem -- 16px
+$small-font-size: $base-font-size * 0.75; // 0.75rem -- 12px
+$medium-font-size-title: $base-font-size * 1.25; // 1.25rem -- 20px
+$large-font-size: $base-font-size * 1.5; // 1.5rem -- 24px
+$medium-large-font-size: $base-font-size * 1.75; // 1.75rem -- 28px
+$extra-large-font-size: $base-font-size * 2; // 2rem --32px
+$hipper-extra-large-font-size: $base-font-size * 2.25; // 2.25rem --36px
+
+/*excepciones*/
+
+$menu-font-size: 0.875rem; // 14px
+
+@mixin efectocaida($time) {
+  opacity: 0;
+  animation: fadeInUp;
+  animation-fill-mode: forwards;
+  animation-duration: 0.8s;
+  animation-delay: $time;
+}
+
+@mixin efectosubida($time) {
+  opacity: 0;
+  animation: fade-in-down;
+  animation-fill-mode: forwards;
+  animation-duration: 0.8s;
+  animation-delay: $time;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    -webkit-transform: translateY(20px);
+    -moz-transform: translateY(20px);
+    -ms-transform: translateY(20px);
+    -o-transform: translateY(20px);
+}
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bounce {
+  animation: bounce 2s ease infinite;
+}
+
+@keyframes bounce {
+    50% { transform:translateY(0%); }
+    80% { transform:translateY(-15%); }
+    90% { transform:translateY(0%); }
+    95% { transform:translateY(-7%); }
+    97% { transform:translateY(0%); }
+    99% { transform:translateY(-3%); }
+    100% { transform:translateY(0); }
+}

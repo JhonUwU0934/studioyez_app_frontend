@@ -1,0 +1,159 @@
+<div class="container">
+    <nav class="sidebar" [class.close]="isClose">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="https://i.ibb.co/6vLKy9f/angular.png" alt="">
+                    <!-- <i class="fa-brands fa-square-pied-piper"></i> -->
+                </span>
+
+                <div class="text header-text">
+                    <span class="name">Studio Yez</span>
+                    <!-- <span class="profession">Web developer</span> -->
+                </div>
+            </div>
+
+            <!-- <i class='bx bx-chevron-right toggle' (click)="toggleClose()"></i> -->
+        </header>
+
+        <div class="menu-bar">
+            <div class="menu-bar-content">
+                <div class="menu">
+
+                    <ul>
+                        <li (click)="toggleSearch()" class="search-box nav-link">
+                            <i class='bx bx-search icon'></i>
+                            <input  type="text" placeholder="Search...">
+                        </li>
+                    </ul>
+
+                    <ul class="menu-links">
+                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                            <a routerLink="./home">
+                                <i class='bx bx-home-alt icon' ></i>
+                                <span class="text nav-text">Home</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                            <a routerLink="./ventas">
+                                <i class="fa-solid fa-file-invoice-dollar icon"></i>
+                                <span class="text nav-text">Ventas</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                            <a routerLink="./gastos">
+                                <i class="fa-solid fa-money-bill-wave icon"></i>
+                                <span class="text nav-text">Gastos</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                            <a routerLink="./productos">
+                                <i class="fa-brands fa-product-hunt icon"></i>
+                                <span class="text nav-text">Productos</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                            <a routerLink="./devolucion">
+                                <i class="fa-solid fa-right-left icon"></i>
+                                <span class="text nav-text">Devoluciones</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                          <a routerLink="./ingreso-mercancia">
+                            <i class="fa-solid fa-plus icon"></i>
+                            <span class="text nav-text">Ingreso de mercancía</span>
+                          </a>
+                      </li>
+                        <!-- <li class="nav-link" routerLinkActive="active">
+                            <a routerLink="./inventario">
+                                <i class="fa-solid fa-receipt icon"></i>
+                                <span class="text nav-text">Inventario</span>
+                            </a>
+                        </li>  -->
+
+                        <!-- <li class="nav-link" routerLinkActive="active">
+                            <a routerLink="./configuracion">
+                                <i class="fa-solid fa-wrench icon"></i>
+                                <span class="text nav-text">Configuación</span>
+                            </a>
+                        </li> -->
+
+                        <!-- <li class="nav-link" routerLinkActive="active">
+                            <a routerLink="./facturacion">
+                                <i class="fa-solid fa-file-lines icon"></i>
+                                <span class="text nav-text">Facturación</span>
+                            </a>
+                        </li>  -->
+
+                    </ul>
+
+                </div>
+
+                <div class="bottom-content">
+                   <ul>
+                    <li title="Cerrar sesión" class="nav-link" (click)="logout()">
+                        <a>
+                            <i class='bx bx-log-out icon' ></i>
+                            <span class="text nav-text">Cerrar sesión</span>
+                        </a>
+                    </li>
+                   </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </nav>
+
+    <div class="home">
+        <div class="home_header">
+
+          <div class="homer_header_title" >
+           <i class='bx bx-menu' (click)="toggleClose()"></i>
+            <p class="home_dash">Dashboard</p>
+          </div>
+
+           <div class="home_header_perfil">
+            <div class="home_header_perfil_user">
+
+                <ul [ngClass]="isMood? 'change' : 'mode'">
+                    <div class="toggle-switch" (click)="toggleTheme()">
+                        <span class="switch">
+                            <span class="moon"><i class='bx bx-moon'></i></span>
+                            <span class="sun"><i class='bx bx-sun'></i></span>
+                        </span>
+                    </div>
+                </ul>
+
+                <div>
+                    <p class="user_name">Hola, <span>{{usuario.name}}</span></p>
+                    <p class="user_rol">Bienvenido</p>
+                </div>
+
+                <span class="avatar">
+                    <!-- <img [src]="'https://creditoacr.com/wp-content/uploads/2023/08/468-4682069_darryl-cabin-specialist-user-icon-png-small-transparent.jpg'" alt=""> -->
+                    <i class="fa-solid fa-circle-user"></i>
+                </span>
+            </div>
+           </div>
+
+        </div>
+
+        <div class="home_route">
+                <router-outlet></router-outlet>
+                <app-loader></app-loader>
+        </div>
+
+    </div>
+
+
+</div>
+
+<app-modal></app-modal>
+<app-modal-change></app-modal-change>
+

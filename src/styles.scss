@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+
+@import './styles-themes/variables.scss';
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    scroll-behavior: smooth;
+
+    /*colores neutros*/
+    --color-text-neutro: #707070;
+    --primary-color-neutro: rgb(20, 71, 182);
+}
+
+:root {
+    /* primary colors */
+    --primary-color: rgb(20, 71, 182);
+
+    /* secondary colors */
+    --secondary-color-1: #C3272B;
+    --secondary-color-2: #DF575C;
+    --secondary-color-3: #F0A7A9;
+
+    /* complementary colors */
+    --complementary-color-1: #31B5BB;
+    --complementary-color-2: #80D2D6;
+    --complementary-color-3: #D4EFF2;
+
+    /* text colors */
+    --color-text: #707070;
+    --color-text-input: black;
+    --color-text-check: #F4F4F4;
+    --color-text-hover: #F4F4F4;
+    --border-color: #e9ecef;
+    --box-shadow-color: 0 0 2rem 0 rgba(136, 152, 170, .15);
+    --color-text-toggle: #FFF;
+
+    /* fondos*/
+    --fondo-home: #f8f9fe;
+    --sidebar-color-fondo: #FFF;
+    --toggle-color-fondo: #DDD;
+    --fondo-box: #F6F5FF;
+    --fondo-label-input: #d5d9de;
+    --box-label-input: #ddd;
+    --otp: #f3b8be;
+    --fondo-check: #FFF;
+
+}
+
+body.dark-theme {
+
+    /* primary colors */
+    --primary-color: #3a3b3c;
+
+    /* secondary colors */
+    --secondary-color-1: #F2766D;
+    --secondary-color-2: #D55750;
+    --secondary-color-3: #AE3133;
+
+    /* complementary colors */
+    --complementary-color-1: #2BD9D9;
+    --complementary-color-2: #77E4E4;
+    --complementary-color-3: #B3F2F2;
+
+    /* text colors */
+    --color-text: #F4F4F4;
+    --color-text-input: white;
+    --color-text-check: #707070;
+    --color-text-hover: #F4F4F4;
+    --border-color: #323030;
+    --box-shadow-color: none;
+    --color-text-toggle: #FFF;
+
+    /* fondos*/
+    --fondo-home: #18191a;
+    --sidebar-color-fondo: #242526;
+    --toggle-color-fondo: #707070;
+    --fondo-box: #3a3b3c;
+    --fondo-label-input: #3a3b3c;
+    --box-label-input: none;
+    --otp: #242526;
+    --fondo-check: #3a3b3c;
+
+}
+
+.my-pagination ::ng-deep .ngx-pagination a {
+    color: var(--color-text);
+    font-size: 12px;
+}
+
+.my-pagination ::ng-deep .ngx-pagination .current {
+    background: var(--primary-color);
+    border-radius: 5px;
+  }

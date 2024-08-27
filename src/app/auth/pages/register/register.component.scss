@@ -1,0 +1,30 @@
+@import '../../../../styles.scss';
+
+.contenedor{
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    align-items: center;
+    flex-direction: column; 
+    // background-image: url('');
+    background-repeat: no-repeat;
+    background-size: 170px,250px;
+    background-position: bottom right 10px,bottom right;
+
+    .form_container{
+        @include efectocaida($time: 0.2s);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        span{
+            font-size: $base-font-size;
+            color: var(--color-text-neutro);
+            a{
+                text-decoration: none;
+                font-size: $base-font-size;
+                color: var(--primary-color-neutro);
+            }
+        }
+    }
+}

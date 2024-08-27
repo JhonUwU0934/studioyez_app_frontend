@@ -1,0 +1,31 @@
+.contenedor {
+    display: flex;
+    height: 100vh;
+
+    &_left {
+        flex-basis: 65%;
+    }
+
+    &_right {
+        flex-basis: 35%;
+    }
+}
+
+@media (max-width: 1000px) {
+
+    .contenedor {
+        justify-content: center;
+        align-items: center;
+
+        &_left {
+            display: none;
+        }
+
+        &_right {
+            flex-basis: 100%;
+        }
+
+    }
+
+
+}

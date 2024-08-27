@@ -1,0 +1,65 @@
+<div class="container">
+
+    <div class="products-header">
+
+        
+
+        <div class="products-header_pruduct">
+            <span><i class="fa-solid fa-clipboard"></i></span>
+            <p>Registro de productos</p>
+            <p>Ingresa y edita las productos</p>
+        </div>
+
+    </div>
+
+    <div>
+        <div class="product-movements">
+            <app-button-click label="Crear Producto" [buttonMethod]="doSomething"></app-button-click>
+            <div class="input-content">
+                <label class="label" for="busqueda">Buscar:</label>
+                <input class="input" id="busqueda" [(ngModel)]="search" placeholder="Ingresa el codigo del producto">
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Codigo</th>
+                            <th>Denominación</th>
+                            <th>Imagen</th>
+                            <th>Existente</th>
+                            <th>Por mayor</th>
+                            <th>Por unidad</th>
+                            <th>Editar</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let data of (data.data | searchSale:'codigo': search  | paginate: { itemsPerPage: 5, currentPage: p })">
+                        <tr>
+                            <td><span><i class="fa-solid fa-hashtag"></i></span> <span>{{data.codigo}}</span></td>
+                            <td>{{data.denominacion}}</td>
+                            <td>{{data.imagen}}</td>
+                            <td>{{data.existente_en_almacen}}</td>
+                            <td>{{data.precio_por_mayor}}</td>
+                            <td>{{data.precio_por_unidad}}</td>
+                            <td routerLink="/home/productos-form/{{data.id}}" style="color: var(--secondary-color-1); font-size: 18px; cursor: pointer;"><i class="fa-regular fa-pen-to-square"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pagination-controls 
+            class="my-pagination"
+            [directionLinks]="false"
+            (pageChange)="p = $event" 
+            previousLabel="Anterior"
+            nextLabel="Siguiente"  
+            [maxSize]="5" 
+            [responsive]="true"
+            ></pagination-controls>
+            
+
+        </div>
+
+    </div>
+
+</div>
