@@ -1,0 +1,34 @@
+<div  class="carousel-container" >
+   
+        <div 
+        *ngFor="let item of items; let i = index"  
+         [ngClass]="{'image-active':selectedIndex === i}" 
+         class="carousel-container__items" >
+
+         <div class="body_container slideShow" 
+         [ngStyle]="{'background-image': 'url(' + item.imgFondo + ')'}"
+         [ngClass]="{'with-overlay': showOverlay}">
+            
+            <img style="width: 100%;" [src]="" alt="">
+
+         </div>
+
+         <!-- <div class="body_logo">
+            <img src=" " alt="">
+        </div> -->
+    
+    </div>
+
+    <div *ngIf="indicators && items.length > 1" class="carousel-dot-container">
+        <span *ngFor="let dot of items; let i=index" cLass="dot" [ngClass]="{'active': selectedIndex === i}"
+            (click)="selectImage(i)">
+        </span>
+    </div>
+    <div *ngIf="controls" class="btn-carousel btn-prev" (click)="onPrevClick()">
+        <i class="fa-solid fa-chevron-down one icon-carousel icon-prev"></i>
+    </div>
+    <div *ngIf="controls" class="btn-carousel btn-next" (click)="onNextClick()">
+        <i class="fa-solid fa-chevron-down one icon-carousel icon-next"></i>
+    </div>
+
+</div>

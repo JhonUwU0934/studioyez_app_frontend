@@ -1,0 +1,16 @@
+<div class="card-container">
+  
+    <div class="container-card">
+        <i [style.color]="card.coloricon" class='{{card.icon}}'></i>
+        <div class="card_body">
+            <p>{{card.title}}</p>
+            <p>{{card.body}}</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <button (click)="card.onMethodAction()" class="css-button-arrow--red">
+            {{card.footer}}
+        </button>
+    </div>
+</div>

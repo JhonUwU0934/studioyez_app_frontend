@@ -1,0 +1,50 @@
+<div class="container">
+
+  <div class="container-left">
+      <span (click)="doSomething()" class="back">
+          <i class="fa-solid fa-arrow-left"></i>
+      </span>
+      <form (ngSubmit)="getSubmit()" [formGroup]="productForm" class="page slide-page flash">
+
+          <div class="form_header">
+              <div class="form_title">
+                  <h2>Agregar Producto</h2>
+              </div>
+          </div>
+
+
+
+          <div class="content-inputs">
+            <br>
+            <span>SELECCIONA PRODUCTO</span>
+            <select class="select-productos" (change)="seleccionarProducto($event)">
+              <option *ngFor="let item of products" [value]="item.id">
+                {{ item.denominacion }}
+              </option>
+            </select>
+
+
+            <div *ngIf="products.length === 0">
+              No products available.
+            </div>
+
+
+              <app-input [form]="productForm" [arrayInput]="arrayInput3">
+              </app-input>
+          </div>
+
+          <div class="content-inputs">
+              <app-input [form]="productForm" [arrayInput]="arrayInput4">
+              </app-input>
+          </div>
+
+
+          <div class="form-button">
+              <app-button [label]="'Guardar'" [myForm]="productForm"></app-button>
+              <!-- <app-button-click [label]="'Ver todas'" [buttonMethod]="doSomething"></app-button-click> -->
+          </div>
+
+      </form>
+  </div>
+</div>
+

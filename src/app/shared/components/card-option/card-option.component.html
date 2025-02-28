@@ -1,0 +1,12 @@
+<div *ngIf="card" class="container" routerLink="../{{card.route}}">
+    <div class="container-card">
+        <i [style.color]="card.coloricon" class='{{card.icon}}'></i>
+        <div class="card_body">
+            <p>{{card.title}}</p>
+            <p>{{card.subtitle}}</p>
+        </div>
+    </div>
+    <div class="container-card_footer">
+        <!-- <i class='bx bx-notepad icon'></i> -->
+    </div>
+</div>

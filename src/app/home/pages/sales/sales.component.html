@@ -1,0 +1,82 @@
+<div class="container">
+
+    <div class="products-header">
+
+        
+
+        <div class="products-header_pruduct">
+            <span><i class="fa-solid fa-scale-unbalanced"></i></span>
+            <p>Registro de ventas</p>
+            <p>Ingresa y edita las ventas</p>
+        </div>
+
+    </div>
+
+    <div>
+        <div class="product-movements">
+            <app-button-click label="Generar Venta" [buttonMethod]="doSomething"></app-button-click>
+
+              <div class="input-content">
+                <label class="label" for="busqueda">Buscar:</label>
+                <input class="input" id="busqueda" [(ngModel)]="search" placeholder="Ingresa el codigo de factura">
+               </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Productos</th>
+                            <th>Cliente</th>
+                            <th>Vendedor</th>
+                            <th>Factura</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let data of (data.data | searchSale:'codigo_factura': search  | paginate: { itemsPerPage: 5, currentPage: p })">
+                        <tr>
+                            <td><span class="date"><i class="fa-solid fa-calendar"></i></span> <span> {{data.created_at | date}}</span></td>
+                            <td>{{data.precio_venta | customNumber}}</td>
+                            <!-- <td style="width: 70%;">
+                                <div class="grid">
+                                    <div class="card-grid" *ngFor="let item of data.productos">
+                                       <div>
+                                        <div class="denomination">{{item.denominacion  | textFilter}} </div>
+                                        <div>{{item.total_producto | customNumber}}</div>
+                                        <div># {{item.cantidad}}</div>
+                                       </div>
+                                    </div>
+                                </div>
+                            </td> -->
+                            <td>
+                                <select class="select-productos">
+                                    <option *ngFor="let item of data.productos" value=""> {{item.denominacion  | textFilter}} {{'Precio: '+ (item.total_producto | customNumber)}} {{'Cantidad:'+item.cantidad}}</option>
+                                  </select>
+                                  
+                            </td>
+                            <td>{{data.nombre_comprador}}</td>
+                            <td>{{data.vendedor.name}}</td>
+                            <td *ngIf="data.estado_pago === 1; else template1"><span class="icon"><a target="_blank" [href]="data.url_factura"><i class="fa-solid fa-file-invoice"></i></a></span></td>
+                            <ng-template #template1>
+                                <span class="button"><button [class.loading]="data.loading"  class="action-btn" (click)="activateSale(data.id,data)">Activar</button></span>
+                            </ng-template>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pagination-controls 
+            class="my-pagination"
+            [directionLinks]="false"
+            (pageChange)="p = $event" 
+            previousLabel="Anterior"
+            nextLabel="Siguiente"  
+            [maxSize]="5" 
+            [responsive]="true"
+            ></pagination-controls>
+
+        </div>
+
+    </div>
+
+</div>

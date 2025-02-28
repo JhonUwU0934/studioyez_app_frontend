@@ -1,0 +1,64 @@
+<div class="container">
+
+    <div class="products-header">
+
+
+
+        <div class="products-header_pruduct">
+            <span><i class="fa-solid fa-right-left icon"></i></span>
+            <p>Devoluciones</p>
+            <p>Gestion de devoluciones CLIENTE - ALMACÉN</p>
+        </div>
+
+    </div>
+
+    <div>
+        <div class="product-movements">
+            <app-button-click label="Generar devolucion" [buttonMethod]="doSomething"></app-button-click>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>producto_id</th>
+                            <th>cantidad</th>
+                            <th>código de producto</th>
+                            <th>precio_venta</th>
+                            <th>cliente</th>
+                            <th>fecha</th>
+                            <th>Id quien_recibe</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let data of (data.data | searchSale:'codigo': search  | paginate: { itemsPerPage: 5, currentPage: p })">
+                        <tr>
+                            <td>{{data.producto_id}}</td>
+                            <td>{{data.cantidad}}</td>
+                            <td>{{data.codigo}}</td>
+                            <td>{{data.precio_venta}}</td>
+                            <td>{{data.cliente}}</td>
+                            <td>{{data.fecha}}</td>
+                            <td>{{data.quien_recibe}}</td>
+                            <td>{{data.created_at}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <pagination-controls
+            class="my-pagination"
+            [directionLinks]="false"
+            (pageChange)="p = $event"
+            previousLabel="Anterior"
+            nextLabel="Siguiente"
+            [maxSize]="5"
+            [responsive]="true"
+            ></pagination-controls>
+
+
+        </div>
+
+    </div>
+
+</div>

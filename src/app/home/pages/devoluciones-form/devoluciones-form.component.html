@@ -1,0 +1,87 @@
+<div class="container">
+
+  <div class="container-left">
+      <span (click)="doSomething()" class="back">
+          <i class="fa-solid fa-arrow-left"></i>
+      </span>
+      <div  class="page slide-page flash">
+
+          <div class="form_header">
+              <div class="form_title">
+                  <h2>Generar devolución cliente - almacén</h2>
+              </div>
+          </div>
+
+
+
+         <div class="input-content">
+          <label class="label" for="">Producto</label>
+          <input type="text" class="input" [(ngModel)]="codigoBuscado" placeholder="Ingresa el codigo de factura" (keyup.enter)="onEnterPressed()">
+          <div *ngIf="valid" class="error-code"><p>Has ingresado un codigo que no existe </p></div>
+          <div *ngIf="validProduct" class="error-code"><p>Ya has ingresado este producto, solo cambia la cantidad</p></div>
+          <div *ngIf="existProduct" class="error-code"><p>Este producto no tiene existencias en el almacen</p></div>
+         </div>
+
+          <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Cliente</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody *ngFor="let data of VentasFiltrados | paginate: { itemsPerPage: 5, currentPage: p }; let i = index">
+                  <tr>
+                    <td>{{data.codigo_factura}}</td>
+                    <td>
+                      <select class="select-productos" (change)="seleccionarProducto($event)">
+                        <option *ngFor="let item of data.productos" [value]="item.codigo">
+                          {{item.denominacion | textFilter}} {{'Precio: '+ (item.total_producto | customNumber)}} {{'Cantidad:'+item.cantidad}}
+                        </option>
+                      </select>
+
+                    </td>
+                    <td><input class="input-quantiti" style="width: 40px;" type="number" [(ngModel)]="quantities[i]" (input)="onCantidadChange(data,i)"></td>
+                    <td>{{data.precio_venta | customNumber}}</td>
+                    <td>{{data.nombre_comprador}}</td>
+                    <td><span class="icon"><a (click)="eliminarItem(data.codigo_factura,productoSeleccionado, quantities[i])"> <i class="fa-solid fa-x"></i></a></span></td>
+                  </tr>
+                </tbody>
+
+
+
+            </table>
+        </div>
+
+          <pagination-controls
+          class="my-pagination"
+          [directionLinks]="false"
+          (pageChange)="p = $event"
+          previousLabel="Anterior"
+          nextLabel="Siguiente"
+          [maxSize]="5"
+          [responsive]="true"
+          ></pagination-controls>
+
+
+          <form *ngIf="isItemsArrayValid()" (ngSubmit)="getSubmit()" [formGroup]="saleForm" class="page slide-page flash">
+
+              <div class="form-button">
+                  <app-button [label]="'Generar Devolución almacén'" [myForm]="saleForm"></app-button>
+              </div>
+
+          </form>
+
+
+
+
+      </div>
+  </div>
+</div>
+
+
+

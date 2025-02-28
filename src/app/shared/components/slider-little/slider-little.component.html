@@ -1,0 +1,38 @@
+<div  class="carousel-container">
+   
+    <div *ngFor="let item of items; let i = index"  
+         [ngClass]="{'image-active':selectedIndex === i}" 
+         class="carousel-container__items " >
+
+         <div class="body_container">
+            <img style="width: 80px;" class="fade" [src]="item.img" alt="">
+            <div class="body_container-text">
+                <p>{{item.parrafo}}</p>
+            </div>
+            <div class="body_container-button">
+                <a style="text-decoration: none;" target="_blank" href="">
+                    <div>
+                        <h3>
+                            {{item.contact}}
+                        </h3>
+                       </div>
+                   </a>
+            </div>
+         </div>
+    
+    </div>
+
+    <div *ngIf="indicators" class="carousel-dot-container">
+        <span *ngFor="let dot of items; let i=index" cLass="dot" [ngClass]="{'active': selectedIndex === i}"
+            (click)="selectImage(i)">
+        </span>
+    </div>
+    <div *ngIf="controls" class="btn-carousel btn-prev" (click)="onPrevClick()">
+        <i class="fa-solid fa-chevron-down one icon-carousel icon-prev"></i>
+    </div>
+    <div *ngIf="controls" class="btn-carousel btn-next" (click)="onNextClick()">
+        <i class="fa-solid fa-chevron-down one icon-carousel icon-next"></i>
+    </div>
+
+</div>
+

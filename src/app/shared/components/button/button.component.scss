@@ -1,0 +1,65 @@
+@import '../../../../styles.scss';
+
+.action-btn {
+	background: var(--primary-color-neutro);
+	border: none;
+	font-size: $small-font-size;
+	width: 100%;
+	margin: 0 auto;
+	font-weight: 600;
+	padding: 10px;
+	color: white;
+	border-radius: 5px;
+	transition: 0.2s;
+	cursor: pointer;
+	position: relative;
+	display: block;
+
+	&:hover {
+		background-color: var(--primary-color-neutro);
+	}
+
+	&::after {
+		content: '';
+		display: block;
+		width: 1.2em;
+		height: 1.2em;
+		position: absolute;
+		left: calc(50% - 0.75em);
+		top: calc(50% - 0.75em);
+		// border: 0.15em solid transparent;
+		border: 0.25em solid transparent;
+		border-right-color: white;
+		border-radius: 50%;
+		animation: button-anim 0.7s linear infinite;
+		opacity: 0;
+		-webkit-animation: button-anim 0.7s linear infinite;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: no-drop;
+		top: 0;
+	}
+}
+
+.action-btn.loading {
+	color: transparent;
+	padding: 10px;
+	// width: 35px;
+	// border-radius: 30px;
+
+	&::after {
+		opacity: 1;
+	}
+}
+
+@keyframes button-anim {
+	from {
+		transform: rotate(0);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+}

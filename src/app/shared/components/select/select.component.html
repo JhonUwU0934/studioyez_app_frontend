@@ -1,0 +1,15 @@
+<div class="content-input">
+<label *ngIf="arraySelect.labelExists" class="label" for="">{{arraySelect.name}}</label>
+<div class="form__field"  [formGroup]="form">
+    <label class="label-izq">
+        <span><i [class]="arraySelect.icon"></i></span>
+    </label>
+    <select name="select" [formControlName]="arraySelect.controlName">
+        <option value="" hidden>{{arraySelect.placeholder}}</option>
+        <option name="select" *ngFor="let item of arraySelect.selects" [value]="item.value">{{item.name}}</option>
+    </select>
+    <div class="select-arrow">
+        <div class="arrow-down"></div>
+    </div>
+</div>
+</div>

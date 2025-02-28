@@ -1,0 +1,60 @@
+
+    <label *ngIf="arrayInput.labelExists" class="label" for="">{{arrayInput.name}}</label>
+    <div class="container-body" [ngStyle]="{'width': arrayInput.width || '100%'}">
+        <div class="form__field"  [formGroup]="form">
+            <label class="label-izq" *ngIf="arrayInput.iconExists">
+                <span><i [class]="arrayInput.icon"></i></span>
+            </label>
+            <input 
+            [placeholder]="arrayInput.placeholder" 
+            class="input" 
+            [type]="arrayInput.type" 
+            (input)="arrayInput.type === 'tel' ? onlyNumbers($event) : ''" 
+            (input)="arrayInput.decimal? formatoNumerico($event): ''" 
+            [formControlName]="arrayInput.controlName"
+            [ngClass]="{'input-error': form.get(arrayInput.controlName)?.invalid && form.get(arrayInput.controlName)?.dirty}"
+            >
+            <span class="error-icon" *ngIf="form.get(arrayInput.controlName)?.invalid && form.get(arrayInput.controlName)?.dirty"><i class="fa-solid fa-circle-exclamation"></i></span>  
+        </div>     
+        <!-- <div 
+        class="text-danger"
+        *ngIf="form.get(arrayInput.controlName)?.dirty && form.get(arrayInput.controlName)?.errors?.['required'] ">
+        
+        <i class="fa-solid fa-circle-exclamation"></i>
+            Ingresa {{arrayInput.placeholder}}
+        
+        </div> -->
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <input *ngIf="arrayInput.type=='date'" [placeholder]="arrayInput.placeholder" class="input" type="text" [formControlName]="arrayInput.controlName" onfocus="(this.type='date')" onblur="(this.type='text')" /> -->

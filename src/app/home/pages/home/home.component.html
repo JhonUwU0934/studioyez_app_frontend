@@ -1,0 +1,68 @@
+
+<div class="container">
+
+    <div class="home-title">
+        <p>¡Bienvenido!</p>
+    </div>
+
+    <div class="home-cupo">
+        <div class="internal_mount">
+        
+                <div class="container-card" *Ske="skeleton(); widthLabel:'150px' heightLabel:'35px' widthInput:'100px' heightInput:'35px' type: 'label-input'">
+                    <div class="container-card_amount"><span>{{amount | customNumber}}</span> <span (click)="amountOpenModal()"><i class="fa-regular fa-pen-to-square"></i></span></div>
+                    <p class="container-card_amount-title">Monto inicial</p>           
+                </div>
+
+                <div class="container-card_footer" >
+                    <p *skeleton="skeleton(); 
+                    repeat: 4; 
+                    height: '20px'; 
+                    width: 'rand'">Gestiona el monto inicial de operaciones diarias. 
+                        Edita este monto cuando necesites. 
+                        Observa ventas, gastos y balance. Toma decisiones informadas para el éxito continuo</p>          
+                </div>
+        
+        </div>
+
+        <div class="internal_details" *Ske="skeleton(); width:'60%' heightRect1:'268px' type:'single'">
+            <p class="home_title">Detalles</p>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td><span style="color: rgb(181, 215, 124);"><i class="fa-solid fa-coins"></i></span> <span>Ventas</span></td>
+                        <td>{{sales | customNumber}}</td>     
+                        <td><i class="fa-regular fa-circle-dot"></i></td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: rgb(255, 165, 52);"><i class="fa-solid fa-sack-dollar"></i></span> <span>Gastos</span></td>
+                        <td>{{bills | customNumber}}</td>
+                        <td><i class="fa-regular fa-circle-dot"></i></td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: var(--primary-color-neutro)"><i class="fa-regular fa-object-ungroup"></i></span> <span>Ventas diarias</span></td>
+                        <td>{{salesD | customNumber}}</td>
+                        <td><i class="fa-regular fa-circle-dot"></i></td>
+                    </tr>   
+                    <tr>
+                        <td><span style="color: var(--primary-color-neutro)"><i class="fa-solid fa-sack-xmark"></i></span> <span>Total</span></td>
+                        <td>{{total | customNumber}}</td>
+                        <td><i class="fa-regular fa-circle-dot"></i></td>
+                    </tr>        
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+
+    <div class="home-options">
+        <div class="grid">
+            <app-card-option *Ske="skeleton(); width:'100%' heightRect1:'119px' type:'single'"[card]="cardSc"></app-card-option>
+            <app-card-option *Ske="skeleton(); width:'100%' heightRect1:'119px' type:'single'"[card]="cardPy"></app-card-option>
+            <app-card-option *Ske="skeleton(); width:'100%' heightRect1:'119px' type:'single'"[card]="cardCont"></app-card-option>
+        </div>
+    </div>
+
+</div>
+
