@@ -1,32 +1,33 @@
-# Utilizamos la imagen base de Node.js
-FROM node:18 as build-stage
+# Usa una imagen base de Node.js para construir la aplicación
+FROM node:18 AS builder
 
-# Instalamos Angular CLI globalmente en la etapa de construcción
-RUN npm install -g @angular/cli
-
-# Establecemos el directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copiamos los archivos de configuración e instalamos las dependencias
-COPY package*.json ./
-RUN npm install
+# Copia los archivos necesarios
+COPY package.json ./
 
-# Copiamos el resto de los archivos del proyecto
+# Instala las dependencias específicas primero
+#RUN npm install @ng-bootstrap/ng-bootstrap@latest
+
+# Instala las dependencias
+RUN npm install --legacy-peer-deps
+
+RUN npm install
+# Copia el resto de los archivos del proyecto
 COPY . .
 
-# Modificamos los límites de tamaño en la configuración de Angular para los archivos que exceden los límites
-RUN sed -i 's_"budgets": \[\]_"budgets": [{"type": "any", "name": "auth/pages/login/login.component.scss", "maximumWarning": "4mb", "maximumError": "4mb"}, {"type": "any", "name": "auth/pages/register/register.component.scss", "maximumWarning": "4mb", "maximumError": "4mb"}, {"type": "any", "name": "home/pages/home/home.component.scss", "maximumWarning": "4mb", "maximumError": "4mb"}]_' angular.json
+# Construye la aplicación Angular
+RUN npm run build -- --configuration=production
 
-# Construimos la aplicación en modo de producción
-RUN ng build --configuration=production
-
-# Nueva etapa del Dockerfile para el servidor de desarrollo de Angular
+# Usa una imagen base de Nginx para servir la aplicación
 FROM nginx:alpine
 
-# Copiamos los archivos compilados de la etapa de construcción al servidor Nginx
-COPY --from=build-stage /app/dist/studio_yez_app_frontend /usr/share/nginx/html
+# Copia los archivos de construcción al directorio predeterminado de Nginx
+COPY --from=builder /app/dist/acr_plus_clients_view /usr/share/nginx/html
 
-# Exponemos el puerto 80 para el servidor Nginx
+# Expone el puerto 80
 EXPOSE 80
 
-# No se necesita un comando CMD ya que Nginx se inicia automáticamente
+# Comando para ejecutar Nginx
+CMD ["nginx", "-g", "daemon off;"]
