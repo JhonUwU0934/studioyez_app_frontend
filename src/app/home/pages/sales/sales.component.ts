@@ -109,10 +109,12 @@ export class SalesComponent {
     };
 
     fetch(UrlApi, requestOptions)
-      .then(response => response.text())
+      .then(response => response.json())
       .then(result => {
         data.loading =  false;
-        window.location.reload();
+	console.log(result)
+        this.redirigirAPagina(result.pdf_url)
+        //window.location.reload();
       })
       .catch(error => console.log('error', error));
 
