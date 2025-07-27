@@ -1,3 +1,4 @@
+// ingreso-mercancia-form.component.ts
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -37,6 +38,13 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
   saleId: string = '';
   product!: any;
   products: any[] = [];
+  
+  // Nuevas propiedades para el filtro
+  filteredProducts: any[] = [];
+  searchTerm: string = '';
+  isDropdownOpen: boolean = false;
+  productoSeleccionado: any = null;
+  productoSeleccionadoTexto: string = '';
 
   productForm: FormGroup = this.fb.group({
     date: ['', [Validators.required]],
@@ -66,7 +74,6 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
   };
 
   data: any = { productos: [] };
-  productoSeleccionado: any;
 
   ngOnInit(): void {
     this.getProducts();
@@ -89,6 +96,7 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
           console.log("API Response:", resp);
           this.data = resp;
           this.products = resp.data;
+          this.filteredProducts = [...this.products]; // Inicializar productos filtrados
           console.log('Data:', this.products);
           this.loader.setLoader(false);
         });
@@ -96,18 +104,73 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
     );
   }
 
-  seleccionarProducto(event: any) {
-    const id = event.target ? event.target.value : null;
-    if (id) {
-      this.productoSeleccionado = id;
+  // Método para filtrar productos
+  filterProducts() {
+    if (!this.searchTerm.trim()) {
+      this.filteredProducts = [...this.products];
+      return;
     }
-    console.log(this.productoSeleccionado)
-    return this.productoSeleccionado;
+
+    const search = this.searchTerm.toLowerCase().trim();
+    this.filteredProducts = this.products.filter(product => 
+      product.denominacion.toLowerCase().includes(search) ||
+      product.codigo.toLowerCase().includes(search)
+    );
   }
 
+  // Método para manejar cambios en el input de búsqueda
+  onSearchChange(event: any) {
+    this.searchTerm = event.target.value;
+    this.filterProducts();
+    this.isDropdownOpen = this.searchTerm.length > 0;
+    
+    // Si no hay texto, limpiar selección
+    if (!this.searchTerm.trim()) {
+      this.productoSeleccionado = null;
+      this.productoSeleccionadoTexto = '';
+    }
+  }
 
+  // Método para seleccionar un producto del dropdown
+  selectProduct(product: any) {
+    this.productoSeleccionado = product.id;
+    this.productoSeleccionadoTexto = `${product.codigo} - ${product.denominacion}`;
+    this.searchTerm = this.productoSeleccionadoTexto;
+    this.isDropdownOpen = false;
+    console.log('Producto seleccionado:', this.productoSeleccionado);
+  }
+
+  // Método para abrir/cerrar dropdown
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+    if (this.isDropdownOpen) {
+      this.filterProducts();
+    }
+  }
+
+  // Método para cerrar dropdown cuando se hace click fuera
+  onBlur() {
+    // Usar setTimeout para permitir que el click en una opción se procese antes
+    setTimeout(() => {
+      this.isDropdownOpen = false;
+    }, 200);
+  }
+
+  // Método para limpiar selección
+  clearSelection() {
+    this.productoSeleccionado = null;
+    this.productoSeleccionadoTexto = '';
+    this.searchTerm = '';
+    this.filteredProducts = [...this.products];
+    this.isDropdownOpen = false;
+  }
 
   getSubmit() {
+    if (!this.productoSeleccionado) {
+      alert('Por favor selecciona un producto');
+      return;
+    }
+
     const formData = this.productForm.getRawValue();
 
     const headers = {
@@ -115,7 +178,7 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
     };
 
     const paramsBody = {
-      producto_id: this.seleccionarProducto(event),
+      producto_id: this.productoSeleccionado,
       fecha: formData.date,
       cantidad_de_ingreso: formData.cantidad
     };
@@ -134,14 +197,10 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
         (error) => {
           this.buttonService.setCHange(false);
           console.log('There has been a problem with your fetch operation:', error);
-
         }
       )
     );
   }
-
-
-
 
   ngOnDestroy(): void {
     this.subscriptions$.unsubscribe();
@@ -161,5 +220,10 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
 
   padNumber(num: number): string {
     return num < 10 ? `0${num}` : `${num}`;
+  }
+
+  // Método trackBy para optimizar el rendimiento del *ngFor
+  trackByProductId(index: number, product: any): any {
+    return product.id;
   }
 }

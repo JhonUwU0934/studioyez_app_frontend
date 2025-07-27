@@ -214,3 +214,250 @@ table {
   font-size: 1.15rem;
   margin-bottom: 13px;
 }
+
+
+// Agregar estos estilos al archivo ingreso-mercancia-form.component.scss existente
+
+// Estilos para el select filtrable personalizado
+.custom-select-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+
+  .custom-select-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .custom-select-input {
+      width: 100%;
+      padding: 12px 60px 12px 15px;
+      background-color: var(--sidebar-color-fondo);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      font-size: $small-font-size;
+      color: var(--color-text-input);
+      font-weight: 600;
+      outline: none;
+      transition: all 0.3s ease;
+
+      &:focus {
+        border-color: var(--color-primary, #007bff);
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+      }
+
+      &::placeholder {
+        color: var(--color-text);
+        font-weight: 400;
+        opacity: 0.7;
+      }
+    }
+
+    .clear-button {
+      position: absolute;
+      right: 35px;
+      background: none;
+      border: none;
+      color: var(--color-text);
+      cursor: pointer;
+      padding: 5px;
+      font-size: 14px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+
+      &:hover {
+        opacity: 1;
+        color: #dc3545;
+      }
+    }
+
+    .dropdown-button {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--color-text);
+      cursor: pointer;
+      padding: 5px;
+      font-size: 12px;
+      transition: transform 0.3s ease;
+
+      .fa-chevron-down {
+        transition: transform 0.3s ease;
+
+        &.rotated {
+          transform: rotate(180deg);
+        }
+      }
+
+      &:hover {
+        color: var(--color-primary, #007bff);
+      }
+    }
+  }
+
+  .custom-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: var(--sidebar-color-fondo);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 250px;
+    overflow: hidden;
+
+    .dropdown-content {
+      max-height: 250px;
+      overflow-y: auto;
+
+      // Personalizar scrollbar
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--sidebar-color-fondo);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 3px;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--color-text);
+      }
+    }
+
+    .no-products {
+      padding: 15px;
+      text-align: center;
+      color: var(--color-text);
+      opacity: 0.7;
+      font-style: italic;
+    }
+
+    .dropdown-item {
+      padding: 12px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+      }
+
+      &.selected {
+        background-color: rgba(0, 123, 255, 0.2);
+        
+        .product-code {
+          color: var(--color-primary, #007bff);
+          font-weight: 600;
+        }
+      }
+
+      .product-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .product-code {
+          font-size: $small-font-size;
+          font-weight: 600;
+          color: var(--color-text);
+        }
+
+        .product-name {
+          font-size: $small-font-size;
+          color: var(--color-text);
+          opacity: 0.8;
+        }
+      }
+
+      .product-details {
+        margin-top: 4px;
+
+        .product-price {
+          font-size: 11px;
+          color: rgb(181, 215, 124);
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// Información del producto seleccionado
+.selected-product-info {
+  margin-bottom: 15px;
+  padding: 8px 12px;
+  background-color: rgba(0, 123, 255, 0.1);
+  border: 1px solid rgba(0, 123, 255, 0.3);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+// Mensaje cuando no hay productos disponibles
+.no-products-available {
+  padding: 15px;
+  text-align: center;
+  color: var(--color-text);
+  opacity: 0.7;
+  font-style: italic;
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+// Responsivo para móviles
+@media (max-width: 768px) {
+  .custom-select-container {
+    .custom-select-dropdown {
+      max-height: 200px;
+    }
+
+    .custom-select-input-container {
+      .custom-select-input {
+        padding: 10px 50px 10px 12px;
+        font-size: 14px;
+      }
+    }
+
+    .dropdown-item {
+      padding: 10px 12px;
+
+      .product-info {
+        .product-code,
+        .product-name {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}
+
+// Animaciones
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-select-dropdown {
+  animation: fadeIn 0.2s ease-out;
+}

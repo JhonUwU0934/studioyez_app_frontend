@@ -1,50 +1,103 @@
+<!-- ingreso-mercancia-form.component.html -->
 <div class="container">
-
   <div class="container-left">
-      <span (click)="doSomething()" class="back">
-          <i class="fa-solid fa-arrow-left"></i>
-      </span>
-      <form (ngSubmit)="getSubmit()" [formGroup]="productForm" class="page slide-page flash">
+    <span (click)="doSomething()" class="back">
+      <i class="fa-solid fa-arrow-left"></i>
+    </span>
+    <form (ngSubmit)="getSubmit()" [formGroup]="productForm" class="page slide-page flash">
 
-          <div class="form_header">
-              <div class="form_title">
-                  <h2>Agregar Producto</h2>
+      <div class="form_header">
+        <div class="form_title">
+          <h2>Agregar Producto</h2>
+        </div>
+      </div>
+
+      <div class="content-inputs">
+        <br>
+        <span>SELECCIONA PRODUCTO</span>
+        
+        <!-- Select filtrable personalizado -->
+        <div class="custom-select-container">
+          <div class="custom-select-input-container">
+            <input 
+              type="text" 
+              class="custom-select-input"
+              [value]="searchTerm"
+              (input)="onSearchChange($event)"
+              (focus)="toggleDropdown()"
+              (blur)="onBlur()"
+              placeholder="Buscar por código o denominación..."
+            >
+            
+            <!-- Botón para limpiar selección -->
+            <button 
+              type="button" 
+              class="clear-button"
+              *ngIf="productoSeleccionado"
+              (click)="clearSelection()"
+            >
+              <i class="fa-solid fa-times"></i>
+            </button>
+            
+            <!-- Icono de dropdown -->
+            <button 
+              type="button" 
+              class="dropdown-button"
+              (click)="toggleDropdown()"
+            >
+              <i class="fa-solid fa-chevron-down" [class.rotated]="isDropdownOpen"></i>
+            </button>
+          </div>
+
+          <!-- Dropdown con productos filtrados -->
+          <div class="custom-select-dropdown" *ngIf="isDropdownOpen">
+            <div class="dropdown-content">
+              
+              <!-- Mostrar mensaje si no hay productos -->
+              <div class="no-products" *ngIf="filteredProducts.length === 0">
+                <span>No se encontraron productos</span>
               </div>
-          </div>
 
-
-
-          <div class="content-inputs">
-            <br>
-            <span>SELECCIONA PRODUCTO</span>
-            <select class="select-productos" (change)="seleccionarProducto($event)">
-              <option *ngFor="let item of products" [value]="item.id">
-                {{ item.denominacion }}
-              </option>
-            </select>
-
-
-            <div *ngIf="products.length === 0">
-              No products available.
+              <!-- Lista de productos filtrados -->
+              <div 
+                class="dropdown-item"
+                *ngFor="let product of filteredProducts; trackBy: trackByProductId"
+                (click)="selectProduct(product)"
+                [class.selected]="productoSeleccionado === product.id"
+              >
+                <div class="product-info">
+                  <span class="product-code">{{ product.codigo }}</span>
+                  <span class="product-name">{{ product.denominacion }}</span>
+                </div>
+                <div class="product-details" *ngIf="product.precio_por_unidad">
+                  <small class="product-price">${{ product.precio_por_unidad }}</small>
+                </div>
+              </div>
             </div>
-
-
-              <app-input [form]="productForm" [arrayInput]="arrayInput3">
-              </app-input>
           </div>
+        </div>
 
-          <div class="content-inputs">
-              <app-input [form]="productForm" [arrayInput]="arrayInput4">
-              </app-input>
-          </div>
+        <!-- Mostrar producto seleccionado -->
+        <div class="selected-product-info" *ngIf="productoSeleccionado">
+          <small>Producto seleccionado: {{ productoSeleccionadoTexto }}</small>
+        </div>
 
+        <!-- Mensaje si no hay productos disponibles -->
+        <div *ngIf="products.length === 0" class="no-products-available">
+          No hay productos disponibles.
+        </div>
 
-          <div class="form-button">
-              <app-button [label]="'Guardar'" [myForm]="productForm"></app-button>
-              <!-- <app-button-click [label]="'Ver todas'" [buttonMethod]="doSomething"></app-button-click> -->
-          </div>
+        <app-input [form]="productForm" [arrayInput]="arrayInput3"></app-input>
+      </div>
 
-      </form>
+      <div class="content-inputs">
+        <app-input [form]="productForm" [arrayInput]="arrayInput4"></app-input>
+      </div>
+
+      <div class="form-button">
+        <app-button [label]="'Guardar'" [myForm]="productForm"></app-button>
+      </div>
+
+    </form>
   </div>
 </div>
-
