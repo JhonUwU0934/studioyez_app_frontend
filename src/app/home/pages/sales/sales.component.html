@@ -1,82 +1,217 @@
 <div class="container">
 
     <div class="products-header">
-
-        
-
         <div class="products-header_pruduct">
             <span><i class="fa-solid fa-scale-unbalanced"></i></span>
             <p>Registro de ventas</p>
             <p>Ingresa y edita las ventas</p>
         </div>
-
     </div>
 
     <div>
         <div class="product-movements">
             <app-button-click label="Generar Venta" [buttonMethod]="doSomething"></app-button-click>
 
-              <div class="input-content">
+            <div class="input-content">
                 <label class="label" for="busqueda">Buscar:</label>
-                <input class="input" id="busqueda" [(ngModel)]="search" placeholder="Ingresa el codigo de factura">
-               </div>
+                <input class="input" id="busqueda" [(ngModel)]="search" placeholder="Ingresa el código de factura">
+            </div>
 
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>Fecha</th>
+                            <th>Cliente</th>
                             <th>Total</th>
                             <th>Productos</th>
-                            <th>Cliente</th>
                             <th>Vendedor</th>
+                            <th>Estado</th>
                             <th>Factura</th>
                         </tr>
                     </thead>
-                    <tbody *ngFor="let data of (data.data | searchSale:'codigo_factura': search  | paginate: { itemsPerPage: 5, currentPage: p })">
+                    <tbody *ngFor="let data of (data.data | searchSale:'codigo_factura': search | paginate: { itemsPerPage: 5, currentPage: p })">
                         <tr>
-                            <td><span class="date"><i class="fa-solid fa-calendar"></i></span> <span> {{data.created_at | date}}</span></td>
-                            <td>{{data.precio_venta | customNumber}}</td>
-                            <!-- <td style="width: 70%;">
-                                <div class="grid">
-                                    <div class="card-grid" *ngFor="let item of data.productos">
-                                       <div>
-                                        <div class="denomination">{{item.denominacion  | textFilter}} </div>
-                                        <div>{{item.total_producto | customNumber}}</div>
-                                        <div># {{item.cantidad}}</div>
-                                       </div>
+                            <!-- FECHA -->
+                            <td>
+                                <div class="fecha-cell">
+                                    <span class="date">
+                                        <i class="fa-solid fa-calendar"></i>
+                                    </span>
+                                    <div class="fecha-info">
+                                        <div class="fecha-principal">{{data.created_at | date:'dd/MM/yyyy'}}</div>
+                                        <div class="fecha-hora">{{data.created_at | date:'HH:mm'}}</div>
                                     </div>
                                 </div>
-                            </td> -->
-                            <td>
-                                <select class="select-productos">
-                                    <option *ngFor="let item of data.productos" value=""> {{item.denominacion  | textFilter}} {{'Precio: '+ (item.total_producto | customNumber)}} {{'Cantidad:'+item.cantidad}}</option>
-                                  </select>
-                                  
                             </td>
-                            <td>{{data.nombre_comprador}}</td>
-                            <td>{{data.vendedor.name}}</td>
-                            <td *ngIf="data.estado_pago === 1; else template1"><span class="icon"><a target="_blank" [href]="data.url_factura"><i class="fa-solid fa-file-invoice"></i></a></span></td>
-                            <ng-template #template1>
-                                <span class="button"><button [class.loading]="data.loading"  class="action-btn" (click)="activateSale(data.id,data)">Activar</button></span>
-                            </ng-template>
+
+                            <!-- CLIENTE -->
+                            <td>
+                                <div class="cliente-cell">
+                                    <div class="cliente-nombre">{{data.nombre_comprador}}</div>
+                                    <div class="cliente-telefono">{{data.numero_comprador}}</div>
+                                    <div class="codigo-factura">{{data.codigo_factura}}</div>
+                                </div>
+                            </td>
+
+                            <!-- TOTAL -->
+                            <td>
+                                <div class="total-cell">
+                                    <div class="precio-principal">${{data.precio_venta | customNumber}}</div>
+                                    <div class="descuentos" *ngIf="getTotalDescuentos(data) > 0">
+                                        Desc: ${{getTotalDescuentos(data) | customNumber}}
+                                    </div>
+                                    <div class="badge-variantes" *ngIf="esVentaConVariantes(data)">
+                                        <i class="fa-solid fa-tags"></i> Con variantes
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- PRODUCTOS -->
+                            <td class="productos-column">
+                                <div class="productos-container">
+                                    <!-- Resumen de productos -->
+                                    <div class="productos-resumen">
+                                        <span class="total-productos">
+                                            {{getTotalProductosDiferentes(data)}} producto(s) |
+                                            {{getTotalProductos(data)}} unidad(es)
+                                        </span>
+                                    </div>
+
+                                    <!-- Lista detallada de productos -->
+                                    <div class="productos-detalle">
+                                        <div *ngFor="let item of data.productos; let i = index" 
+                                             class="producto-item"
+                                             [class.con-variante]="tieneVariante(item)">
+                                            
+                                            <!-- Información básica del producto -->
+                                            <div class="producto-header">
+                                                <div class="producto-nombre">
+                                                    <i class="fa-solid fa-box" *ngIf="!tieneVariante(item)"></i>
+                                                    <i class="fa-solid fa-tags" *ngIf="tieneVariante(item)"></i>
+                                                    {{item.denominacion | textFilter}}
+                                                </div>
+                                                <div class="producto-codigo">{{item.codigo}}</div>
+                                            </div>
+
+                                            <!-- Información de variante (si existe) -->
+                                            <div *ngIf="tieneVariante(item)" class="variante-info">
+                                                <span class="sku-badge">{{item.pivot.sku_vendido}}</span>
+                                            </div>
+
+                                            <!-- Información de precios y cantidad -->
+                                            <div class="producto-detalles">
+                                                <div class="cantidad-precio">
+                                                    <span class="cantidad">Cant: {{item.pivot.cantidad}}</span>
+                                                    <span class="precio-unitario">
+                                                        <!-- ✅ CORREGIDO: Usar método del componente en lugar de función directa -->
+                                                        ${{getPrecioUnitarioFormateado(item) | customNumber}}
+                                                    </span>
+                                                </div>
+                                                
+                                                <div class="total-descuento">
+                                                    <span class="total-producto">
+                                                        Total: ${{item.pivot.total_producto | customNumber}}
+                                                    </span>
+                                                    <!-- ✅ CORREGIDO: Usar método del componente -->
+                                                    <span *ngIf="tieneDescuento(item.pivot.descuento)" class="descuento">
+                                                        Desc: ${{item.pivot.descuento | customNumber}}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Expandir/contraer si hay muchos productos -->
+                                    <div *ngIf="data.productos.length > 3" class="productos-toggle">
+                                        <button type="button" class="btn-toggle">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                            Ver todos ({{data.productos.length}})
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- VENDEDOR -->
+                            <td>
+                                <div class="vendedor-cell">
+                                    <i class="fa-solid fa-user"></i>
+                                    {{data.vendedor.name}}
+                                </div>
+                            </td>
+
+                            <!-- ESTADO -->
+                            <td>
+                                <div class="estado-cell">
+                                    <div *ngIf="data.estado_pago === '1'" class="estado-activo">
+                                        <i class="fa-solid fa-check-circle"></i>
+                                        Pagada
+                                    </div>
+                                    <div *ngIf="!data.estado_pago || data.estado_pago !== '1'" class="estado-pendiente">
+                                        <i class="fa-solid fa-clock"></i>
+                                        Pendiente
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- FACTURA -->
+                            <td>
+                                <div class="factura-cell">
+                                    <div *ngIf="data.estado_pago === '1'; else template1" class="factura-disponible">
+                                        <a target="_blank" [href]="data.url_factura" class="btn-factura">
+                                            <i class="fa-solid fa-file-invoice"></i>
+                                            Ver Factura
+                                        </a>
+                                    </div>
+                                    <ng-template #template1>
+                                        <div class="factura-pendiente">
+                                            <button 
+                                                [class.loading]="data.loading" 
+                                                class="action-btn" 
+                                                (click)="activateSale(data.id, data)"
+                                                [disabled]="data.loading">
+                                                <i *ngIf="!data.loading" class="fa-solid fa-play"></i>
+                                                Activar Venta
+                                            </button>
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
+            <!-- INFORMACIÓN ADICIONAL SOBRE LAS VENTAS -->
+            <div class="ventas-estadisticas" *ngIf="data.data.length > 0">
+                <div class="estadistica-item">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Total ventas: {{data.data.length}}</span>
+                </div>
+                <div class="estadistica-item">
+                    <i class="fa-solid fa-tags"></i>
+                    <!-- ✅ CORREGIDO: Usar método del componente -->
+                    <span>Con variantes: {{contarVentasConVariantes()}}</span>
+                </div>
+                <div class="estadistica-item">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                    <!-- ✅ CORREGIDO: Usar método del componente -->
+                    <span>Total vendido: ${{calcularTotalVendido() | customNumber}}</span>
+                </div>
+            </div>
+
+            <!-- PAGINACIÓN -->
             <pagination-controls 
-            class="my-pagination"
-            [directionLinks]="false"
-            (pageChange)="p = $event" 
-            previousLabel="Anterior"
-            nextLabel="Siguiente"  
-            [maxSize]="5" 
-            [responsive]="true"
-            ></pagination-controls>
+                class="my-pagination"
+                [directionLinks]="false"
+                (pageChange)="p = $event" 
+                previousLabel="Anterior"
+                nextLabel="Siguiente"  
+                [maxSize]="5" 
+                [responsive]="true">
+            </pagination-controls>
 
         </div>
-
     </div>
 
 </div>

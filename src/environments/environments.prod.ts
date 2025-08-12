@@ -1,4 +1,4 @@
 export const environments = {
     production: true,
-    baseUrl: 'https://api.studioyez.shop',
+    baseUrl: 'http://127.0.0.1:8000',
 }

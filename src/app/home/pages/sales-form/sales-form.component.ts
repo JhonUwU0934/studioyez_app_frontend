@@ -15,6 +15,58 @@ import { environments } from 'src/environments/environments';
 import { Producto } from '../../models/login.model';
 import { modalModel } from 'src/app/shared/models/modal.model';
 
+// INTERFACES PARA VARIANTES CORREGIDAS
+interface Variante {
+  id: number;
+  sku: string;
+  existente_en_almacen: number;
+  precio_por_mayor: string;
+  precio_por_unidad: string;
+  imagen_variante?: string;
+  activo: boolean;
+  color?: Color;
+  talla?: Talla;
+}
+
+interface Color {
+  id: number;
+  nombre: string;
+  codigo_hex?: string;
+}
+
+interface Talla {
+  id: number;
+  nombre: string;
+  orden: number;
+}
+
+interface ProductoConVariantes {
+  id: number;
+  codigo: string;
+  denominacion: string;
+  imagen?: string;
+  existente_en_almacen: number;
+  precio_por_mayor: string;
+  precio_por_unidad: string;
+  variantes?: Variante[];
+}
+
+interface ProductoVenta {
+  codigo: string;
+  denominacion: string;
+  cantidad: number;
+  total: number;
+  descuento: number;
+  precio_por_unidad: number;
+  variante_seleccionada?: Variante;
+  variante_id?: number;
+  sku_variante?: string;
+  // Campos para mostrar en la tabla
+  color_nombre?: string;
+  talla_nombre?: string;
+  stock_disponible: number; // ✅ CORREGIDO: Ya no opcional
+}
+
 @Component({
   selector: 'app-sales-form',
   templateUrl: './sales-form.component.html',
@@ -41,8 +93,11 @@ export class SalesFormComponent {
   valid: boolean = false;
   validProduct: boolean = false;
   existProduct: boolean = false;
+  noVariantes: boolean = false;
 
   codigoBuscado: string = '';
+  productoEncontrado: ProductoConVariantes | null = null;
+  varianteSeleccionada: Variante | null = null;
 
   cantidadProducto: number = 1;
   multiplicador: number = 2;
@@ -50,423 +105,11 @@ export class SalesFormComponent {
   quantities: { [index: number]: number } = {};
   porcentaje: { [index: number]: number } = {};
 
-  arraySelects: any = {
-      selects: [
-        {
-          value: 0,
-          name: '0',
-        },
-        {
-          value: 1,
-          name: '1',
-        },
-        {
-          value: 2,
-          name: '2',
-        },
-        {
-          value: 3,
-          name: '3',
-        },
-        {
-          value: 4,
-          name: '4',
-        },
-        {
-          value: 5,
-          name: '5',
-        },
-        {
-          value: 6,
-          name: '6',
-        },
-        {
-          value: 7,
-          name: '7',
-        },
-        {
-          value: 8,
-          name: '8',
-        },
-        {
-          value: 9,
-          name: '9',
-        },
-        {
-          value: 10,
-          name: '10',
-        },
-        {
-          value: 11,
-          name: '11',
-        },
-        {
-          value: 12,
-          name: '12',
-        },
-        {
-          value: 13,
-          name: '13',
-        },
-        {
-          value: 14,
-          name: '14',
-        },
-        {
-          value: 15,
-          name: '15',
-        },
-        {
-          value: 16,
-          name: '16',
-        },
-        {
-          value: 17,
-          name: '17',
-        },
-        {
-          value: 18,
-          name: '18',
-        },
-        {
-          value: 19,
-          name: '19',
-        },
-        {
-          value: 20,
-          name: '20',
-        },
-        {
-          value: 21,
-          name: '21',
-        },
-        {
-          value: 22,
-          name: '22',
-        },
-        {
-          value: 23,
-          name: '23',
-        },
-        {
-          value: 24,
-          name: '24',
-        },
-        {
-          value: 25,
-          name: '25',
-        },
-        {
-          value: 26,
-          name: '26',
-        },
-        {
-          value: 27,
-          name: '27',
-        },
-        {
-          value: 28,
-          name: '28',
-        },
-        {
-          value: 29,
-          name: '29',
-        },
-        {
-          value: 30,
-          name: '30',
-        },
-        {
-          value: 31,
-          name: '31',
-        },
-        {
-          value: 32,
-          name: '32',
-        },
-        {
-          value: 33,
-          name: '33',
-        },
-        {
-          value: 34,
-          name: '34',
-        },
-        {
-          value: 35,
-          name: '35',
-        },
-        {
-          value: 36,
-          name: '36',
-        },
-        {
-          value: 37,
-          name: '37',
-        },
-        {
-          value: 38,
-          name: '38',
-        },
-        {
-          value: 39,
-          name: '39',
-        },
-        {
-          value: 40,
-          name: '40',
-        },
-        {
-          value: 41,
-          name: '41',
-        },
-        {
-          value: 42,
-          name: '42',
-        },
-        {
-          value: 43,
-          name: '43',
-        },
-        {
-          value: 44,
-          name: '44',
-        },
-        {
-          value: 45,
-          name: '45',
-        },
-        {
-          value: 46,
-          name: '46',
-        },
-        {
-          value: 47,
-          name: '47',
-        },
-        {
-          value: 48,
-          name: '48',
-        },
-        {
-          value: 49,
-          name: '49',
-        },
-        {
-          value: 50,
-          name: '50',
-        },
-        {
-          value: 51,
-          name: '51',
-        },
-        {
-          value: 52,
-          name: '52',
-        },
-        {
-          value: 53,
-          name: '53',
-        },
-        {
-          value: 54,
-          name: '54',
-        },
-        {
-          value: 55,
-          name: '55',
-        },
-        {
-          value: 56,
-          name: '56',
-        },
-        {
-          value: 57,
-          name: '57',
-        },
-        {
-          value: 58,
-          name: '58',
-        },
-        {
-          value: 59,
-          name: '59',
-        },
-        {
-          value: 60,
-          name: '60',
-        },
-        {
-          value: 61,
-          name: '61',
-        },
-        {
-          value: 62,
-          name: '62',
-        },
-        {
-          value: 63,
-          name: '63',
-        },
-        {
-          value: 64,
-          name: '64',
-        },
-        {
-          value: 65,
-          name: '65',
-        },
-        {
-          value: 66,
-          name: '66',
-        },
-        {
-          value: 67,
-          name: '67',
-        },
-        {
-          value: 68,
-          name: '68',
-        },
-        {
-          value: 69,
-          name: '69',
-        },
-        {
-          value: 70,
-          name: '70',
-        },
-        {
-          value: 71,
-          name: '71',
-        },
-        {
-          value: 72,
-          name: '72',
-        },
-        {
-          value: 73,
-          name: '73',
-        },
-        {
-          value: 74,
-          name: '74',
-        },
-        {
-          value: 75,
-          name: '75',
-        },
-        {
-          value: 76,
-          name: '76',
-        },
-        {
-          value: 77,
-          name: '77',
-        },
-        {
-          value: 78,
-          name: '78',
-        },
-        {
-          value: 79,
-          name: '79',
-        },
-        {
-          value: 80,
-          name: '80',
-        },
-        {
-          value: 81,
-          name: '81',
-        },
-        {
-          value: 82,
-          name: '82',
-        },
-        {
-          value: 83,
-          name: '83',
-        },
-        {
-          value: 84,
-          name: '84',
-        },
-        {
-          value: 85,
-          name: '85',
-        },
-        {
-          value: 86,
-          name: '86',
-        },
-        {
-          value: 87,
-          name: '87',
-        },
-        {
-          value: 88,
-          name: '88',
-        },
-        {
-          value: 89,
-          name: '89',
-        },
-        {
-          value: 90,
-          name: '90',
-        },
-        {
-          value: 91,
-          name: '91',
-        },
-        {
-          value: 92,
-          name: '92',
-        },
-        {
-          value: 93,
-          name: '93',
-        },
-        {
-          value: 94,
-          name: '94',
-        },
-        {
-          value: 95,
-          name: '95',
-        },
-        {
-          value: 96,
-          name: '96',
-        },
-        {
-          value: 97,
-          name: '97',
-        },
-        {
-          value: 98,
-          name: '98',
-        },
-        {
-          value: 99,
-          name: '99',
-        },
-        {
-          value: 100,
-          name: '100',
-        }
-      ]
-      
-    }
-
-
   total = signal(0);
   p: number = 1;
 
-
-  productosFiltrados: any[] = [];
-  productos: any[] = [];
+  productos: ProductoConVariantes[] = [];
+  productosFiltrados: ProductoVenta[] = [];
 
   saleForm: FormGroup = this.fb.group({
     name: ['', [Validators.required]],
@@ -495,7 +138,7 @@ export class SalesFormComponent {
     type: 'text',
   };
 
-  private productosCopia: any[] = [];
+  private productosCopia: ProductoConVariantes[] = [];
 
   ngOnInit(): void {
     this.subscriptions$.add(
@@ -508,60 +151,166 @@ export class SalesFormComponent {
   }
 
   onEnterPressed() {
-    const productosEncontrados = this.productos.filter((elemento: any) => elemento.codigo === this.codigoBuscado);
+    this.resetErrorStates();
+    
+    const productosEncontrados = this.productos.filter(
+      (elemento: ProductoConVariantes) => elemento.codigo === this.codigoBuscado
+    );
 
-    if (productosEncontrados.length > 0) {if (productosEncontrados[0].existente_en_almacen === 0) {this.existProduct = true;return;} else {this.existProduct = false;}}
-    this.valid = productosEncontrados.length === 0;
-    this.validProduct = productosEncontrados.length > 0;
+    if (productosEncontrados.length === 0) {
+      this.valid = true;
+      return;
+    }
+
+    const producto = productosEncontrados[0];
+    
+    // Verificar si el producto tiene variantes
+    if (!producto.variantes || producto.variantes.length === 0) {
+      this.noVariantes = true;
+      return;
+    }
+
+    // Verificar si el producto ya está en la lista
+    const existingIndex = this.productosFiltrados.findIndex(
+      (item) => item.codigo === producto.codigo
+    );
+    
+    if (existingIndex !== -1) {
+      this.validProduct = true;
+      return;
+    }
+
+    // Establecer el producto encontrado para mostrar sus variantes
+    this.productoEncontrado = producto;
     this.codigoBuscado = '';
+  }
 
-    if (productosEncontrados.length > 0) {
-      const existingIndex = this.productosFiltrados.findIndex((item) => item.codigo === productosEncontrados[0].codigo);
-      if (existingIndex === -1) {
-        this.productosFiltrados.push(...productosEncontrados);
-        this.actualizarTotalGeneral();
-        this.validProduct = false;
-      } else {
-        this.validProduct = true;
-      }
+  onVarianteSelected(variante: Variante) {
+    if (!this.productoEncontrado) return;
+
+    // Verificar stock de la variante
+    if (variante.existente_en_almacen === 0) {
+      this.existProduct = true;
+      return;
+    }
+
+    this.varianteSeleccionada = variante;
+    this.existProduct = false;
+  }
+
+  onAgregarProducto() {
+    if (!this.productoEncontrado || !this.varianteSeleccionada) return;
+
+    const nuevoProducto: ProductoVenta = {
+      codigo: this.productoEncontrado.codigo,
+      denominacion: this.productoEncontrado.denominacion,
+      cantidad: 1,
+      total: parseFloat(this.varianteSeleccionada.precio_por_unidad),
+      descuento: 0,
+      precio_por_unidad: parseFloat(this.varianteSeleccionada.precio_por_unidad),
+      variante_seleccionada: this.varianteSeleccionada,
+      variante_id: this.varianteSeleccionada.id,
+      sku_variante: this.varianteSeleccionada.sku,
+      color_nombre: this.varianteSeleccionada.color?.nombre || 'Sin color',
+      talla_nombre: this.varianteSeleccionada.talla?.nombre || 'Sin talla',
+      stock_disponible: this.varianteSeleccionada.existente_en_almacen // ✅ CORREGIDO: Siempre tendrá valor
+    };
+
+    this.productosFiltrados.push(nuevoProducto);
+    
+    // Inicializar cantidad en el array de quantities
+    const newIndex = this.productosFiltrados.length - 1;
+    this.quantities[newIndex] = 1;
+    this.porcentaje[newIndex] = 0;
+
+    this.actualizarTotalGeneral();
+    this.resetSelection();
+  }
+
+  onCantidadChange(producto: ProductoVenta, index: number) {
+    const cantidad = this.quantities[index];
+    
+    // Verificar que no exceda el stock disponible
+    if (cantidad > producto.stock_disponible) {
+      this.quantities[index] = producto.stock_disponible;
+      this.showStockError();
+      return;
+    }
+
+    const indexEnProductosFiltrados = this.productosFiltrados.findIndex(
+      (item) => item.codigo === producto.codigo && item.variante_id === producto.variante_id
+    );
+    
+    if (indexEnProductosFiltrados !== -1) {
+      this.productosFiltrados[indexEnProductosFiltrados].total = 
+        producto.precio_por_unidad * cantidad;
+      this.productosFiltrados[indexEnProductosFiltrados].cantidad = cantidad;
+      this.actualizarTotalGeneral();
     }
   }
 
-  onCantidadChange(producto: any, index: number) {
-    const indexEnProductosFiltrados = this.productosFiltrados.findIndex((item) => item.codigo === producto.codigo);
-    let cantidad = this.quantities[index];
-    this.productosFiltrados[indexEnProductosFiltrados].total = producto.precio_por_unidad * cantidad;
-    this.productosFiltrados[indexEnProductosFiltrados].cantidad = cantidad;
-    this.actualizarTotalGeneral();
+  onPorcentajeChange(producto: ProductoVenta, index: number) {
+    const cantidad = this.quantities[index];
+    const precioOriginal = producto.variante_seleccionada?.precio_por_unidad || producto.precio_por_unidad;
+    const precioNumerico = parseFloat(precioOriginal.toString());
+    
+    const indexEnProductosFiltrados = this.productosFiltrados.findIndex(
+      (item) => item.codigo === producto.codigo && item.variante_id === producto.variante_id
+    );
+    
+    if (indexEnProductosFiltrados !== -1) {
+      const descuento = Number(String(this.porcentaje[index]).replace(/[,.]/g, ''));
+      const precioConDescuento = precioNumerico - descuento;
+      
+      this.productosFiltrados[indexEnProductosFiltrados].precio_por_unidad = precioConDescuento;
+      this.productosFiltrados[indexEnProductosFiltrados].total = precioConDescuento * cantidad;
+      this.productosFiltrados[indexEnProductosFiltrados].descuento = descuento;
+      this.actualizarTotalGeneral();
+    }
   }
 
-  
-
-  prod:number = 0;
-
-  onPorcentajeChange(producto: any, index: number){
-       let cantidad = this.quantities[index];
-       const productosEnc = this.productosCopia.filter((elemento: any) => elemento.codigo === producto.codigo);
-       this.prod = productosEnc[0].total;
-       const indexEnProductosFiltrados = this.productosFiltrados.findIndex((item) => item.codigo === producto.codigo);
-       let porcent = Number(String(this.porcentaje[index]).replace(/[,.]/g, ''));
-       this.productosFiltrados[indexEnProductosFiltrados].precio_por_unidad = this.prod - porcent;
-       this.productosFiltrados[indexEnProductosFiltrados].total = (this.prod - porcent) * cantidad;
-       this.productosFiltrados[indexEnProductosFiltrados].descuento = porcent;
-       this.actualizarTotalGeneral();    
-       console.log(this.obtenerDatosCombinados());
-       
+  onDeleteProducto(producto: ProductoVenta) {
+    const index = this.productosFiltrados.findIndex(
+      (item) => item.codigo === producto.codigo && item.variante_id === producto.variante_id
+    );
+    
+    if (index !== -1) {
+      this.productosFiltrados.splice(index, 1);
+      delete this.quantities[index];
+      delete this.porcentaje[index];
+      this.actualizarTotalGeneral();
+    }
   }
 
-
-  convertirAPorcentaje(numero: number): number {
-    return numero / 100;
+  private resetErrorStates() {
+    this.valid = false;
+    this.validProduct = false;
+    this.existProduct = false;
+    this.noVariantes = false;
   }
 
-  onDeleteProducto(producto: any) {
-    const index = this.productosFiltrados.findIndex((item) => item.codigo === producto.codigo);
-    this.productosFiltrados.splice(index, 1);
-    this.actualizarTotalGeneral();
+  // ✅ CORREGIDO: Ahora es público para poder usarse en el template
+  public resetSelection() {
+    this.productoEncontrado = null;
+    this.varianteSeleccionada = null;
+  }
+
+  private showStockError() {
+    const newModalData: modalModel = {
+      viewModal: true,
+      clickOutside: true,
+      title: 'Stock Insuficiente',
+      colorIcon: 'red',
+      icon: 'fa-solid fa-triangle-exclamation',
+      message: 'La cantidad solicitada excede el stock disponible de esta variante',
+      onMethod: () => {
+        newModalData.viewModal = false;
+      },
+      onMethodAction: () => {},
+      loader: false,
+      buttonText: 'Cerrar',
+    };
+    this.modalService.setArray(newModalData);
   }
 
   private actualizarTotalGeneral() {
@@ -570,15 +319,20 @@ export class SalesFormComponent {
   }
 
   calcularTotalGeneral() {
-    return this.productosFiltrados.reduce((total, producto) => total + Number(producto.total),0);
+    return this.productosFiltrados.reduce(
+      (total, producto) => total + Number(producto.total),
+      0
+    );
   }
 
-  
+  // ✅ NUEVO MÉTODO: Para calcular cantidad total en el template
+  calcularCantidadTotal(): number {
+    return this.productosFiltrados.reduce((sum, p) => sum + p.cantidad, 0);
+  }
+
   isItemsArrayValid(): boolean {
     return this.productosFiltrados.length > 0;
   }
-
-  
 
   getProductos() {
     this.loader.setLoader(true);
@@ -586,16 +340,10 @@ export class SalesFormComponent {
     const headers = { Authorization: this.token };
 
     this.apiGet.getDebtInfo(UrlApi, headers).subscribe((resp) => {
-
       this.loader.setLoader(false);
       this.productos = resp.data;
       this.productosCopia = JSON.parse(JSON.stringify(resp.data));
-      console.log(this.productosCopia);
-
-      this.productos.forEach((producto, index) => {
-        this.quantities[index] = 1;
-      });
-
+      console.log('Productos con variantes:', this.productos);
     });
   }
 
@@ -605,7 +353,9 @@ export class SalesFormComponent {
         cantidad: producto.cantidad,
         codigo: producto.codigo,
         total: producto.total,
-        descuento: producto.descuento
+        descuento: producto.descuento,
+        variante_id: producto.variante_id, // NUEVO CAMPO OBLIGATORIO
+        sku_variante: producto.sku_variante // CAMPO ALTERNATIVO
       };
     });
 
@@ -613,8 +363,10 @@ export class SalesFormComponent {
   }
 
   getSubmit() {
+    if (!this.isItemsArrayValid()) return;
 
     const formData = this.saleForm.getRawValue();
+    this.buttonService.setCHange(true);
 
     var myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/json');
@@ -624,9 +376,7 @@ export class SalesFormComponent {
       vendedor: this.id,
       nombre_comprador: formData.name,
       numero_comprador: formData.cell,
-      cantidad: this.obtenerDatosCombinados().length,
       productos: this.obtenerDatosCombinados(),
-      precio_venta: this.total(),
     });
 
     var requestOptions = {
@@ -638,40 +388,56 @@ export class SalesFormComponent {
 
     fetch(`${this.baseUrl}/api/v1/ventas`, requestOptions)
       .then((response) => response.json())
-      .then(
-        (result) => {
-          console.log(result);
+      .then((result) => {
+        console.log('Respuesta del servidor:', result);
+        this.buttonService.setCHange(false);
 
-            this.buttonService.setCHange(false);
-            this.router.navigate(['/home/ventas']);
-          
-          // if (result.success) {
-          
-          // }else{
-        
-          // }
-         
-        })
+        if (result.data && result.data.id) {
+          // Venta exitosa
+          const successModal: modalModel = {
+            viewModal: true,
+            clickOutside: true,
+            title: 'Venta Exitosa',
+            colorIcon: 'green',
+            icon: 'fa-solid fa-check-circle',
+            message: `Venta creada exitosamente. Código: ${result.data.codigo_factura}`,
+            onMethod: () => {
+              successModal.viewModal = false;
+              this.router.navigate(['/home/ventas']);
+            },
+            onMethodAction: () => {},
+            loader: false,
+            buttonText: 'Continuar',
+          };
+          this.modalService.setArray(successModal);
+        } else {
+          // Error en la respuesta
+          this.showErrorModal(result.error || 'Error desconocido al crear la venta');
+        }
+      })
       .catch((error) => {
-            this.buttonService.setCHange(false);
-            const newModalData: modalModel = {
-              viewModal: true,
-              clickOutside: true,
-              title: 'Atención',
-              colorIcon: 'red',
-              icon: 'fa-solid fa-triangle-exclamation',
-              message: 'Cantidad ha excedida con respecto a la existencia',
-              onMethod: () => {
-                newModalData.viewModal = false;
-              },
-              onMethodAction: () => {},
-              loader: false,
-              buttonText: 'Cerrar',
-            };
-    
-            this.modalService.setArray(newModalData);
+        console.error('Error:', error);
+        this.buttonService.setCHange(false);
+        this.showErrorModal('Error de conexión. Verifique su conexión a internet.');
       });
+  }
 
+  private showErrorModal(message: string) {
+    const errorModal: modalModel = {
+      viewModal: true,
+      clickOutside: true,
+      title: 'Error',
+      colorIcon: 'red',
+      icon: 'fa-solid fa-triangle-exclamation',
+      message: message,
+      onMethod: () => {
+        errorModal.viewModal = false;
+      },
+      onMethodAction: () => {},
+      loader: false,
+      buttonText: 'Cerrar',
+    };
+    this.modalService.setArray(errorModal);
   }
 
   ngOnDestroy(): void {
@@ -682,79 +448,21 @@ export class SalesFormComponent {
   doSomething() {
     this.router.navigate(['/home/ventas']);
   }
+
+  // MÉTODOS AUXILIARES PARA EL TEMPLATE
+  getVarianteDisplay(variante: Variante): string {
+    let display = variante.sku || `ID: ${variante.id}`;
+    if (variante.color) display += ` - ${variante.color.nombre}`;
+    if (variante.talla) display += ` - ${variante.talla.nombre}`;
+    return display;
+  }
+
+  getVarianteStock(variante: Variante): string {
+    return `Stock: ${variante.existente_en_almacen}`;
+  }
+
+  // ✅ CORREGIDO: Convertir a número antes de formatear
+  getVariantePrecio(variante: Variante): number {
+    return parseFloat(variante.precio_por_unidad);
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // scannedCodes: string[] = [];
-  // currentCode: string = '';
-
-  // @HostListener('document:keydown', ['$event'])
-  // handleKeyDown(event: KeyboardEvent) {
-  //   // Verificar si la tecla presionada es "Enter"
-  //   // console.log(event);
-  //   if (event.key === 'Enter') {
-  //     this.scannedCodes.push(this.currentCode);
-  //     this.currentCode = ''; // Limpiar el código actual
-  //     // console.log(this.scannedCodes);
-  //   } else {
-  //     this.currentCode += event.key;
-  //   }
-  // }
-
-
-   //por si necesito centralizarlo en un servicio
-  // this.getArrayObservable()
-  // .subscribe((newArray) => {
-  //   this.productosFiltrados = newArray;
-  // });
-  // productosNew: any[] = [];
-  // productsSubject = new BehaviorSubject<any>(this.productosNew);
-  // public getArray(): any {
-  //   return {...this.productosNew};
-  // }
-  // public setArray(newArray: any) {
-  //   this.productosNew = newArray;
-  //   this.productsSubject.next(this.productosNew);
-  // }
-  // public getArrayObservable() {
-  //   return this.productsSubject.asObservable();
-  // }
-
-    // onPorcentajeChange(producto: any, index: number){
-  //   let cantidad = this.quantities[index];
-
-  //   const productosEnc = this.productosCopia.filter((elemento: any) => elemento.codigo === producto.codigo);
-  //   this.prod = productosEnc[0].total;
-   
-  //   const indexEnProductosFiltrados = this.productosFiltrados.findIndex((item) => item.codigo === producto.codigo);
-  //   let porcent = this.convertirAPorcentaje(this.porcentaje[index]);
-  //   this.productosFiltrados[indexEnProductosFiltrados].precio_por_unidad = this.prod - (this.prod * porcent);
-  //   this.productosFiltrados[indexEnProductosFiltrados].total = (this.prod - (this.prod * porcent)) * cantidad;
-  //   this.actualizarTotalGeneral();
-  // }

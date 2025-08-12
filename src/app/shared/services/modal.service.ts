@@ -33,6 +33,20 @@ export class ModalService {
     return {...this.myArray};
   }
 
+  showError(message: string): void {
+    alert(`❌ ${message}`);
+  }
+
+  showConfirm(message: string): Promise<boolean> {
+    return Promise.resolve(confirm(message));
+  }
+
+  showSuccess(message: string): void {
+    // Implementar con tu librería de modales preferida
+    // Por ejemplo: SweetAlert2, Angular Material Dialog, etc.
+    alert(`✅ ${message}`);
+  }
+
   public setArray(newArray: modalModel) {
     this.myArray = newArray;
     this.myArraySubject.next(this.myArray);

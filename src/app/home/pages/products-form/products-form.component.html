@@ -1,49 +1,523 @@
-<div class="container">
-
-    <div class="container-left">
-        <span (click)="doSomething()" class="back">
-            <i class="fa-solid fa-arrow-left"></i>
-        </span>
-        <form (ngSubmit)="getSubmit()" [formGroup]="productForm" class="page slide-page flash">
-
-            <div class="form_header">
-                <div class="form_title">
-                    <h2>Agregar Producto</h2>
-                </div>
-            </div>
-
-          
-
-            <div class="content-inputs">
-                <app-input [form]="productForm" [arrayInput]="arrayInput1">
-                </app-input>
-
-                <app-input [form]="productForm" [arrayInput]="arrayInput3">
-                </app-input>
-            </div>
-
-            <div class="content-inputs">
-                <app-input [form]="productForm" [arrayInput]="arrayInput4">
-                </app-input>
-                
-                <app-input [form]="productForm" [arrayInput]="arrayInput5">
-                </app-input>
-            </div>
-
-           <div class="content-inputs">
-                <app-input [form]="productForm" [arrayInput]="arrayInput6">
-                </app-input>
-
-                <app-input [form]="productForm" [arrayInput]="arrayInput7">
-                </app-input>
-           </div>
-
-            <div class="form-button">
-                <app-button [label]="'Guardar'" [myForm]="productForm"></app-button>
-                <!-- <app-button-click [label]="'Ver todas'" [buttonMethod]="doSomething"></app-button-click> -->
-            </div>
-
-        </form>
+<div class="products-form-container">
+  <div class="form-header">
+    <h2 class="form-title">
+      <i class="fas fa-box" *ngIf="!isEditMode && !isDuplicateMode"></i>
+      <i class="fas fa-edit" *ngIf="isEditMode"></i>
+      <i class="fas fa-copy" *ngIf="isDuplicateMode"></i>
+      
+      {{ isEditMode ? 'Editar Producto' : (isDuplicateMode ? 'Duplicar Producto' : 'Crear Nuevo Producto') }}
+    </h2>
+    
+    <div class="header-actions">
+      <!-- Botón para generar todos los SKUs -->
+      <button type="button" class="btn btn-info" (click)="generateAllSKUs()" 
+              *ngIf="variantesArray.length > 0"
+              title="Generar SKUs para todas las variantes">
+        <i class="fas fa-magic"></i>
+        Generar SKUs
+      </button>
+      
+      <button type="button" class="btn-back" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+        Volver
+      </button>
     </div>
-</div>
+  </div>
 
+  <!-- Indicador de modo -->
+  <div class="mode-indicator" *ngIf="isDuplicateMode">
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle"></i>
+      <strong>Modo Duplicación:</strong> Estás creando una copia del producto. 
+      El código y nombre han sido modificados automáticamente.
+    </div>
+  </div>
+
+  <div class="form-content" *ngIf="!isLoading">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+      
+      <!-- Información Básica -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-info-circle"></i>
+          Información Básica
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="codigo" class="form-label required">Código del Producto</label>
+            <input 
+              type="text" 
+              id="codigo" 
+              formControlName="codigo" 
+              class="form-input"
+              placeholder="Ingrese el código del producto"
+              [class.error]="productForm.get('codigo')?.invalid && productForm.get('codigo')?.touched">
+            <div class="error-message" *ngIf="getFieldError('codigo')">
+              {{ getFieldError('codigo') }}
+            </div>
+            <small class="field-help" *ngIf="isDuplicateMode">
+              Se ha agregado "_COPY" al código original
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="denominacion" class="form-label required">Nombre del Producto</label>
+            <input 
+              type="text" 
+              id="denominacion" 
+              formControlName="denominacion" 
+              class="form-input"
+              placeholder="Ingrese el nombre del producto"
+              [class.error]="productForm.get('denominacion')?.invalid && productForm.get('denominacion')?.touched">
+            <div class="error-message" *ngIf="getFieldError('denominacion')">
+              {{ getFieldError('denominacion') }}
+            </div>
+            <small class="field-help" *ngIf="isDuplicateMode">
+              Se ha agregado "(Copia)" al nombre original
+            </small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="existente_en_almacen" class="form-label">Stock en Almacén</label>
+            <input 
+              type="number" 
+              id="existente_en_almacen" 
+              formControlName="existente_en_almacen" 
+              class="form-input"
+              placeholder="0"
+              min="0">
+            <small class="field-help" *ngIf="isDuplicateMode">
+              El stock se ha reseteado a 0 para la copia
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="precio_por_mayor" class="form-label">Precio por Mayor</label>
+            <div class="input-with-currency">
+              <span class="currency-symbol">$</span>
+              <input 
+                type="number" 
+                id="precio_por_mayor" 
+                formControlName="precio_por_mayor" 
+                class="form-input"
+                placeholder="0.00"
+                step="0.01"
+                min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="precio_por_unidad" class="form-label">Precio por Unidad</label>
+            <div class="input-with-currency">
+              <span class="currency-symbol">$</span>
+              <input 
+                type="number" 
+                id="precio_por_unidad" 
+                formControlName="precio_por_unidad" 
+                class="form-input"
+                placeholder="0.00"
+                step="0.01"
+                min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="imagen" class="form-label">Imagen Principal</label>
+          <input 
+            type="url" 
+            id="imagen" 
+            formControlName="imagen" 
+            class="form-input"
+            placeholder="https://ejemplo.com/imagen.jpg">
+          <div class="image-preview" *ngIf="isValidImageUrl(productForm.get('imagen'))">
+            <img [src]="getImageValue(productForm.get('imagen'))" alt="Vista previa" class="preview-image">
+          </div>
+        </div>
+      </div>
+
+      <!-- Galería de Imágenes -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="fas fa-images"></i>
+            Galería de Imágenes
+            <span class="item-count" *ngIf="galeriaArray.length > 0">({{galeriaArray.length}})</span>
+          </h3>
+          <button type="button" class="btn-add" (click)="addGaleriaItem()">
+            <i class="fas fa-plus"></i>
+            Agregar Imagen
+          </button>
+        </div>
+
+        <div formArrayName="galeria" class="gallery-container">
+          <div 
+            *ngFor="let galeriaItem of galeriaArray.controls; let i = index" 
+            [formGroupName]="i" 
+            class="gallery-item"
+            [class.marked-for-deletion]="galeriaItem.get('eliminar')?.value">
+            
+            <div class="gallery-item-header">
+              <span class="item-number">
+                <i class="fas fa-image"></i>
+                Imagen {{ i + 1 }}
+              </span>
+              
+              <div class="item-actions">
+                <button type="button" 
+                        class="btn-toggle-delete" 
+                        *ngIf="galeriaItem.get('id')?.value && isEditMode"
+                        (click)="galeriaItem.get('eliminar')?.setValue(!galeriaItem.get('eliminar')?.value)"
+                        [class.btn-restore]="galeriaItem.get('eliminar')?.value"
+                        [title]="galeriaItem.get('eliminar')?.value ? 'Restaurar imagen' : 'Marcar para eliminar'">
+                  <i class="fas fa-undo" *ngIf="galeriaItem.get('eliminar')?.value"></i>
+                  <i class="fas fa-trash" *ngIf="!galeriaItem.get('eliminar')?.value"></i>
+                </button>
+                
+                <button type="button" 
+                        class="btn-remove" 
+                        *ngIf="!galeriaItem.get('id')?.value || !isEditMode"
+                        (click)="removeGaleriaItem(i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-grow">
+                <label [for]="'galeria-imagen-' + i" class="form-label required">URL de la Imagen</label>
+                <input 
+                  type="url" 
+                  [id]="'galeria-imagen-' + i" 
+                  formControlName="imagen" 
+                  class="form-input"
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  [disabled]="galeriaItem.get('eliminar')?.value">
+              </div>
+
+              <div class="form-group">
+                <label [for]="'galeria-alt-' + i" class="form-label">Texto Alternativo</label>
+                <input 
+                  type="text" 
+                  [id]="'galeria-alt-' + i" 
+                  formControlName="alt_text" 
+                  class="form-input"
+                  placeholder="Descripción de la imagen"
+                  [disabled]="galeriaItem.get('eliminar')?.value">
+              </div>
+
+              <div class="form-group">
+                <label [for]="'galeria-orden-' + i" class="form-label">Orden</label>
+                <input 
+                  type="number" 
+                  [id]="'galeria-orden-' + i" 
+                  formControlName="orden" 
+                  class="form-input"
+                  placeholder="0"
+                  min="0"
+                  [disabled]="galeriaItem.get('eliminar')?.value">
+              </div>
+            </div>
+
+            <div class="image-preview" *ngIf="isValidImageUrl(galeriaItem.get('imagen')) && !galeriaItem.get('eliminar')?.value">
+              <img 
+                [src]="getImageValue(galeriaItem.get('imagen'))" 
+                [alt]="galeriaItem.get('alt_text')?.value || 'Imagen del producto'" 
+                class="preview-image">
+            </div>
+
+            <!-- Overlay para elementos marcados para eliminar -->
+            <div class="deletion-overlay" *ngIf="galeriaItem.get('eliminar')?.value">
+              <div class="deletion-message">
+                <i class="fas fa-trash"></i>
+                <span>Marcado para eliminar</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="galeriaArray.length === 0" class="empty-state">
+            <i class="fas fa-images"></i>
+            <p>No hay imágenes en la galería</p>
+            <button type="button" class="btn-add" (click)="addGaleriaItem()">
+              <i class="fas fa-plus"></i>
+              Agregar Primera Imagen
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Variantes del Producto -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="fas fa-layer-group"></i>
+            Variantes del Producto
+            <span class="item-count" *ngIf="variantesArray.length > 0">({{variantesArray.length}})</span>
+          </h3>
+          <button type="button" class="btn-add" (click)="addVarianteItem()">
+            <i class="fas fa-plus"></i>
+            Agregar Variante
+          </button>
+        </div>
+
+        <div formArrayName="variantes" class="variants-container">
+          <div 
+            *ngFor="let varianteItem of variantesArray.controls; let i = index" 
+            [formGroupName]="i" 
+            class="variant-item"
+            [class.marked-for-deletion]="varianteItem.get('eliminar')?.value">
+            
+            <div class="variant-header">
+              <span class="item-number">
+                <i class="fas fa-tag"></i>
+                Variante {{ i + 1 }}
+              </span>
+              
+              <div class="variant-actions">
+                <button type="button" class="btn-generate-sku" (click)="generateSKU(i)">
+                  <i class="fas fa-magic"></i>
+                  Generar SKU
+                </button>
+                
+                <button type="button" 
+                        class="btn-toggle-delete" 
+                        *ngIf="varianteItem.get('id')?.value && isEditMode"
+                        (click)="varianteItem.get('eliminar')?.setValue(!varianteItem.get('eliminar')?.value)"
+                        [class.btn-restore]="varianteItem.get('eliminar')?.value"
+                        [title]="varianteItem.get('eliminar')?.value ? 'Restaurar variante' : 'Marcar para eliminar'">
+                  <i class="fas fa-undo" *ngIf="varianteItem.get('eliminar')?.value"></i>
+                  <i class="fas fa-trash" *ngIf="!varianteItem.get('eliminar')?.value"></i>
+                </button>
+                
+                <button type="button" 
+                        class="btn-remove" 
+                        *ngIf="!varianteItem.get('id')?.value || !isEditMode"
+                        (click)="removeVarianteItem(i)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label [for]="'variante-color-' + i" class="form-label">Color</label>
+                <select 
+                  [id]="'variante-color-' + i" 
+                  formControlName="color_id" 
+                  class="form-select"
+                  [disabled]="varianteItem.get('eliminar')?.value">
+                  <option value="">Seleccionar color</option>
+                  <option *ngFor="let color of colores" [value]="color.id">
+                    {{ color.nombre }}
+                  </option>
+                </select>
+                <div class="color-preview" *ngIf="varianteItem.get('color_id')?.value && !varianteItem.get('eliminar')?.value">
+                  <div 
+                    class="color-swatch" 
+                    [style.background-color]="getColorHex(varianteItem.get('color_id')?.value)">
+                  </div>
+                  <span class="color-name">{{ getColorName(varianteItem.get('color_id')?.value) }}</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label [for]="'variante-talla-' + i" class="form-label">Talla</label>
+                <select 
+                  [id]="'variante-talla-' + i" 
+                  formControlName="talla_id" 
+                  class="form-select"
+                  [disabled]="varianteItem.get('eliminar')?.value">
+                  <option value="">Seleccionar talla</option>
+                  <option *ngFor="let talla of tallas" [value]="talla.id">
+                    {{ talla.nombre }}
+                  </option>
+                </select>
+                <div class="size-preview" *ngIf="varianteItem.get('talla_id')?.value && !varianteItem.get('eliminar')?.value">
+                  <span class="size-badge">{{ getTallaName(varianteItem.get('talla_id')?.value) }}</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label [for]="'variante-sku-' + i" class="form-label">SKU</label>
+                <input 
+                  type="text" 
+                  [id]="'variante-sku-' + i" 
+                  formControlName="sku" 
+                  class="form-input"
+                  placeholder="SKU único"
+                  [disabled]="varianteItem.get('eliminar')?.value">
+                <small class="field-help" *ngIf="isDuplicateMode">
+                  Los SKUs han sido regenerados automáticamente
+                </small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label [for]="'variante-stock-' + i" class="form-label">Stock</label>
+                <input 
+                  type="number" 
+                  [id]="'variante-stock-' + i" 
+                  formControlName="existente_en_almacen" 
+                  class="form-input"
+                  placeholder="0"
+                  min="0"
+                  [disabled]="varianteItem.get('eliminar')?.value">
+                <small class="field-help" *ngIf="isDuplicateMode">
+                  Stock reseteado a 0 para la copia
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label [for]="'variante-precio-mayor-' + i" class="form-label">Precio por Mayor</label>
+                <div class="input-with-currency">
+                  <span class="currency-symbol">$</span>
+                  <input 
+                    type="number" 
+                    [id]="'variante-precio-mayor-' + i" 
+                    formControlName="precio_por_mayor" 
+                    class="form-input"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                    [disabled]="varianteItem.get('eliminar')?.value">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label [for]="'variante-precio-unidad-' + i" class="form-label">Precio por Unidad</label>
+                <div class="input-with-currency">
+                  <span class="currency-symbol">$</span>
+                  <input 
+                    type="number" 
+                    [id]="'variante-precio-unidad-' + i" 
+                    formControlName="precio_por_unidad" 
+                    class="form-input"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                    [disabled]="varianteItem.get('eliminar')?.value">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-grow">
+                <label [for]="'variante-imagen-' + i" class="form-label">Imagen de la Variante</label>
+                <input 
+                  type="url" 
+                  [id]="'variante-imagen-' + i" 
+                  formControlName="imagen_variante" 
+                  class="form-input"
+                  placeholder="https://ejemplo.com/variante.jpg"
+                  [disabled]="varianteItem.get('eliminar')?.value">
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    formControlName="activo" 
+                    class="form-checkbox"
+                    [disabled]="varianteItem.get('eliminar')?.value">
+                  <span class="checkbox-text">Activo</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="image-preview small" *ngIf="isValidImageUrl(varianteItem.get('imagen_variante')) && !varianteItem.get('eliminar')?.value">
+              <img 
+                [src]="getImageValue(varianteItem.get('imagen_variante'))" 
+                alt="Imagen de variante" 
+                class="preview-image">
+            </div>
+
+            <!-- Overlay para elementos marcados para eliminar -->
+            <div class="deletion-overlay" *ngIf="varianteItem.get('eliminar')?.value">
+              <div class="deletion-message">
+                <i class="fas fa-trash"></i>
+                <span>Marcado para eliminar</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="variantesArray.length === 0" class="empty-state">
+            <i class="fas fa-layer-group"></i>
+            <p>No hay variantes configuradas</p>
+            <button type="button" class="btn-add" (click)="addVarianteItem()">
+              <i class="fas fa-plus"></i>
+              Agregar Primera Variante
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen del Formulario -->
+      <div class="form-section form-summary" *ngIf="productForm.dirty">
+        <h3 class="section-title">
+          <i class="fas fa-clipboard-check"></i>
+          Resumen
+        </h3>
+        
+        <div class="summary-grid">
+          <div class="summary-item">
+            <label>Total de Imágenes:</label>
+            <span class="summary-value">{{galeriaArray.length}}</span>
+          </div>
+          
+          <div class="summary-item">
+            <label>Total de Variantes:</label>
+            <span class="summary-value">{{variantesArray.length}}</span>
+          </div>
+          
+          <div class="summary-item" *ngIf="isEditMode">
+            <label>Elementos a Eliminar:</label>
+            <span class="summary-value warning">
+              {{ getItemsToDeleteCount() }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="goBack()">
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
+        
+        <button type="button" 
+                class="btn-secondary" 
+                (click)="productForm.reset(); initializeNewProduct()"
+                *ngIf="!isEditMode">
+          <i class="fas fa-eraser"></i>
+          Limpiar Todo
+        </button>
+        
+        <button 
+          type="submit" 
+          class="btn-submit" 
+          [disabled]="productForm.invalid || isLoading"
+          [class.loading]="isLoading">
+          <i class="fas fa-save" *ngIf="!isLoading"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+          {{ isLoading ? 'Guardando...' : 
+             (isEditMode ? 'Actualizar Producto' : 
+              (isDuplicateMode ? 'Crear Copia' : 'Crear Producto')) }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>{{ isEditMode ? 'Cargando producto...' : 
+           (isDuplicateMode ? 'Preparando copia...' : 'Guardando producto...') }}</p>
+    </div>
+  </div>
+</div>

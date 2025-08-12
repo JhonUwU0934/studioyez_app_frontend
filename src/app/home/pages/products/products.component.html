@@ -1,65 +1,326 @@
 <div class="container">
 
     <div class="products-header">
-
-        
-
         <div class="products-header_pruduct">
             <span><i class="fa-solid fa-clipboard"></i></span>
             <p>Registro de productos</p>
-            <p>Ingresa y edita las productos</p>
+            <p>Ingresa y edita productos con variantes, colores y tallas</p>
         </div>
-
     </div>
 
     <div>
         <div class="product-movements">
-            <app-button-click label="Crear Producto" [buttonMethod]="doSomething"></app-button-click>
-            <div class="input-content">
-                <label class="label" for="busqueda">Buscar:</label>
-                <input class="input" id="busqueda" [(ngModel)]="search" placeholder="Ingresa el codigo del producto">
+            
+            <!-- Barra de acciones superior -->
+            <div class="actions-bar">
+                <app-button-click label="Crear Producto" [buttonMethod]="doSomething"></app-button-click>
+                
+                <div class="secondary-actions">
+                    <button class="btn btn-outline" (click)="refreshProducts()" title="Actualizar lista">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar
+                    </button>
+                    <button class="btn btn-outline" (click)="exportProducts()" title="Exportar productos">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Barra de búsqueda -->
+            <div class="search-bar">
+                <div class="input-content">
+                    <label class="label" for="busqueda">Buscar:</label>
+                    <input class="input" 
+                           id="busqueda" 
+                           [(ngModel)]="search" 
+                           placeholder="Buscar por código, nombre, color, talla o SKU"
+                           (input)="p = 1">
+                    <small class="search-help">
+                        Puedes buscar por código, nombre, colores, tallas o SKU de variantes
+                    </small>
+                </div>
+
+                <!-- Indicador de resultados -->
+                <div class="search-results" *ngIf="search && search.trim() !== ''">
+                    <span class="results-count">
+                        {{getFilteredProducts().length}} resultados encontrados
+                    </span>
+                    <button class="btn-clear-search" (click)="search = ''; p = 1" title="Limpiar búsqueda">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>Codigo</th>
+                            <th>Código</th>
                             <th>Denominación</th>
                             <th>Imagen</th>
-                            <th>Existente</th>
-                            <th>Por mayor</th>
-                            <th>Por unidad</th>
-                            <th>Editar</th>
+                            <th>Variantes</th>
+                            <th>Stock Total</th>
+                            <th>Colores</th>
+                            <th>Tallas</th>
+                            <th>Precio Mayor</th>
+                            <th>Precio Unidad</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody *ngFor="let data of (data.data | searchSale:'codigo': search  | paginate: { itemsPerPage: 5, currentPage: p })">
-                        <tr>
-                            <td><span><i class="fa-solid fa-hashtag"></i></span> <span>{{data.codigo}}</span></td>
-                            <td>{{data.denominacion}}</td>
-                            <td>{{data.imagen}}</td>
-                            <td>{{data.existente_en_almacen}}</td>
-                            <td>{{data.precio_por_mayor}}</td>
-                            <td>{{data.precio_por_unidad}}</td>
-                            <td routerLink="/home/productos-form/{{data.id}}" style="color: var(--secondary-color-1); font-size: 18px; cursor: pointer;"><i class="fa-regular fa-pen-to-square"></i></td>
+                    <tbody>
+                        <tr *ngFor="let product of (getFilteredProducts() | paginate: { itemsPerPage: 5, currentPage: p })">
+                            
+                            <!-- Código -->
+                            <td>
+                                <span><i class="fa-solid fa-hashtag"></i></span> 
+                                <span>{{product.codigo}}</span>
+                            </td>
+                            
+                            <!-- Denominación -->
+                            <td>
+                                <div class="product-name">
+                                    <strong>{{product.denominacion}}</strong>
+                                    <small *ngIf="product.tiene_variantes" class="variants-indicator">
+                                        <i class="fa-solid fa-layer-group"></i> Con variantes
+                                    </small>
+                                </div>
+                            </td>
+                            
+                            <!-- Imagen -->
+                            <td>
+                                <div class="product-images">
+                                    <img *ngIf="product.imagen" 
+                                         [src]="product.imagen" 
+                                         [alt]="product.denominacion" 
+                                         class="product-main-image"
+                                         onerror="this.style.display='none'">
+                                    
+                                    <div *ngIf="!product.imagen" class="no-image">
+                                        <i class="fa-solid fa-image"></i>
+                                        <small>Sin imagen</small>
+                                    </div>
+                                    
+                                    <div *ngIf="product.galeria && product.galeria.length > 0" class="gallery-indicator">
+                                        <i class="fa-solid fa-images"></i>
+                                        <span>+{{product.galeria.length}}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <!-- Variantes -->
+                            <td class="text-center">
+                                <div *ngIf="product.tiene_variantes; else noVariants" class="variants-info">
+                                    <div class="variants-count">
+                                        <strong>{{product.variantes_count || 0}}</strong>
+                                        <small>variantes</small>
+                                    </div>
+                                    <div class="variants-stock" *ngIf="product.stock_info">
+                                        <small class="stock-active" *ngIf="product.stock_info.variantes_con_stock > 0">
+                                            {{product.stock_info.variantes_con_stock}} con stock
+                                        </small>
+                                        <small class="stock-inactive" *ngIf="product.stock_info.variantes_sin_stock > 0">
+                                            {{product.stock_info.variantes_sin_stock}} agotadas
+                                        </small>
+                                    </div>
+                                </div>
+                                <ng-template #noVariants>
+                                    <span class="no-variants">
+                                        <i class="fa-solid fa-box"></i>
+                                        <small>Simple</small>
+                                    </span>
+                                </ng-template>
+                            </td>
+                            
+                            <!-- Stock Total -->
+                            <td class="text-center">
+                                <div class="stock-info">
+                                    <div class="stock-total" 
+                                         [class.stock-available]="getStockTotal(product) > 0" 
+                                         [class.stock-empty]="getStockTotal(product) === 0"
+                                         [class.stock-low]="getStockTotal(product) > 0 && getStockTotal(product) <= 5">
+                                        <strong>{{getStockTotal(product)}}</strong>
+                                        <small>unidades</small>
+                                    </div>
+                                    <div class="stock-status" *ngIf="product.stock_info">
+                                        <i class="fa-solid fa-circle" 
+                                           [class.text-success]="product.stock_info.tiene_stock" 
+                                           [class.text-danger]="!product.stock_info.tiene_stock"></i>
+                                        <small>{{product.stock_info.tiene_stock ? 'Disponible' : 'Agotado'}}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <!-- Colores -->
+                            <td>
+                                <div class="colors-info" *ngIf="product.colores_disponibles && product.colores_disponibles.length > 0; else noColors">
+                                    <div class="colors-preview">
+                                        <div class="color-dot" 
+                                             *ngFor="let color of product.colores_disponibles.slice(0, 4)" 
+                                             [style.background-color]="color.codigo_hex"
+                                             [title]="color.nombre">
+                                        </div>
+                                        <span *ngIf="product.colores_disponibles.length > 4" class="more-colors">
+                                            +{{product.colores_disponibles.length - 4}}
+                                        </span>
+                                    </div>
+                                    <div class="colors-list">
+                                        <small>{{getColorNames(product.colores_disponibles)}}</small>
+                                    </div>
+                                </div>
+                                <ng-template #noColors>
+                                    <small class="no-data">Sin colores</small>
+                                </ng-template>
+                            </td>
+                            
+                            <!-- Tallas -->
+                            <td>
+                                <div class="sizes-info" *ngIf="product.tallas_disponibles && product.tallas_disponibles.length > 0; else noSizes">
+                                    <div class="sizes-list">
+                                        <span class="size-badge" *ngFor="let talla of product.tallas_disponibles.slice(0, 5)">
+                                            {{talla.nombre}}
+                                        </span>
+                                        <span *ngIf="product.tallas_disponibles.length > 5" class="more-sizes">
+                                            +{{product.tallas_disponibles.length - 5}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <ng-template #noSizes>
+                                    <small class="no-data">Sin tallas</small>
+                                </ng-template>
+                            </td>
+                            
+                            <!-- Precio Mayor -->
+                            <td>
+                                <div class="price-info">
+                                    <strong>${{formatPrice(product.precio_por_mayor)}}</strong>
+                                    <small *ngIf="hasVariantPrices(product)" class="price-variant">
+                                        <i class="fa-solid fa-info-circle" title="Precios pueden variar por variante"></i>
+                                        Variables
+                                    </small>
+                                </div>
+                            </td>
+                            
+                            <!-- Precio Unidad -->
+                            <td>
+                                <div class="price-info">
+                                    <strong>${{formatPrice(product.precio_por_unidad)}}</strong>
+                                    <small *ngIf="hasVariantPrices(product)" class="price-variant">
+                                        <i class="fa-solid fa-info-circle" title="Precios pueden variar por variante"></i>
+                                        Variables
+                                    </small>
+                                </div>
+                            </td>
+                            
+                            <!-- Estado -->
+                            <td class="text-center">
+                                <div class="product-status">
+                                    <div class="status-indicator" 
+                                         [class.status-active]="isProductActive(product)" 
+                                         [class.status-inactive]="!isProductActive(product)">
+                                        <i class="fa-solid fa-circle"></i>
+                                        <span>{{isProductActive(product) ? 'Activo' : 'Inactivo'}}</span>
+                                    </div>
+                                    <small class="created-date">
+                                        {{formatDate(product.created_at)}}
+                                    </small>
+                                </div>
+                            </td>
+                            
+                            <!-- Acciones -->
+                            <td class="text-center">
+                                <div class="action-buttons">
+                                    <button class="action-btn view-btn" 
+                                            (click)="viewProductDetails(product)"
+                                            title="Ver detalles completos">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    
+                                    <button class="action-btn edit-btn" 
+                                            (click)="editProduct(product)"
+                                            title="Editar producto">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </button>
+                                    
+                                    <button class="action-btn duplicate-btn" 
+                                            (click)="duplicateProduct(product)"
+                                            title="Duplicar producto">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                    
+                                    <button class="action-btn delete-btn" 
+                                            (click)="deleteProduct(product)"
+                                            title="Eliminar producto">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Mensaje cuando no hay productos -->
+                        <tr *ngIf="!hasValidData()">
+                            <td colspan="11" class="text-center no-products">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-box-open"></i>
+                                    <h3>No hay productos disponibles</h3>
+                                    <p>Crea tu primer producto usando el botón "Crear Producto"</p>
+                                    <button class="btn btn-primary" (click)="doSomething()">
+                                        <i class="fas fa-plus"></i>
+                                        Crear Primer Producto
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Mensaje cuando la búsqueda no encuentra resultados -->
+                        <tr *ngIf="hasValidData() && getFilteredProducts().length === 0 && search && search.trim() !== ''">
+                            <td colspan="11" class="text-center no-results">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-search"></i>
+                                    <h3>No se encontraron productos</h3>
+                                    <p>Intenta con otro término de búsqueda o verifica la ortografía</p>
+                                    <button class="btn btn-outline" (click)="search = ''; p = 1">
+                                        <i class="fas fa-times"></i>
+                                        Limpiar Búsqueda
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
+            <!-- Información de paginación -->
+            <div class="pagination-info" *ngIf="shouldShowPagination()">
+                <span class="pagination-summary">
+                    Mostrando productos del 
+                    <strong>{{getStartRange(p)}}</strong> al 
+                    <strong>{{getEndRange(p, getFilteredProducts().length)}}</strong> 
+                    de <strong>{{getFilteredProducts().length}}</strong> total
+                </span>
+            </div>
+
+            <!-- Paginación -->
             <pagination-controls 
-            class="my-pagination"
-            [directionLinks]="false"
-            (pageChange)="p = $event" 
-            previousLabel="Anterior"
-            nextLabel="Siguiente"  
-            [maxSize]="5" 
-            [responsive]="true"
-            ></pagination-controls>
-            
+                class="my-pagination"
+                [directionLinks]="false"
+                (pageChange)="p = $event" 
+                previousLabel="Anterior"
+                nextLabel="Siguiente"  
+                [maxSize]="5" 
+                [responsive]="true">
+            </pagination-controls>
 
         </div>
-
     </div>
+
+    <!-- Modal de Detalles del Producto -->
+    <app-product-details-modal
+        [isVisible]="isModalVisible"
+        [product]="selectedProduct"
+        (closeModalEvent)="closeModal()"
+        (editProductEvent)="editProductFromModal($event)">
+    </app-product-details-modal>
 
 </div>

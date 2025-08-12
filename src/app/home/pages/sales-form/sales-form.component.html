@@ -1,10 +1,9 @@
 <div class="container">
-
     <div class="container-left">
         <span (click)="doSomething()" class="back">
             <i class="fa-solid fa-arrow-left"></i>
         </span>
-        <div  class="page slide-page flash">
+        <div class="page slide-page flash">
 
             <div class="form_header">
                 <div class="form_title">
@@ -12,87 +11,232 @@
                 </div>
             </div>
 
+            <!-- SECCIÓN DE BÚSQUEDA DE PRODUCTOS -->
+            <div class="input-content">
+                <label class="label" for="">Buscar Producto</label>
+                <input 
+                    type="text" 
+                    class="input" 
+                    [(ngModel)]="codigoBuscado" 
+                    placeholder="Ingresa el código de barras y presiona enter o escanea el código" 
+                    (keyup.enter)="onEnterPressed()">
+                
+                <!-- MENSAJES DE ERROR -->
+                <div *ngIf="valid" class="error-code">
+                    <p>Has ingresado un código que no existe</p>
+                </div>
+                <div *ngIf="validProduct" class="error-code">
+                    <p>Ya has ingresado este producto con esta variante</p>
+                </div>
+                <div *ngIf="existProduct" class="error-code">
+                    <p>Esta variante no tiene existencias en el almacén</p>
+                </div>
+                <div *ngIf="noVariantes" class="error-code">
+                    <p>Este producto no tiene variantes configuradas</p>
+                </div>
+            </div>
 
+            <!-- SECCIÓN DE SELECCIÓN DE VARIANTES -->
+            <div *ngIf="productoEncontrado" class="variantes-selection">
+                <div class="producto-encontrado">
+                    <h3 class="producto-title">{{productoEncontrado.denominacion}}</h3>
+                    <p class="producto-codigo">Código: {{productoEncontrado.codigo}}</p>
+                </div>
 
-           <div class="input-content">
-            <label class="label" for="">Producto</label>
-            <input type="text" class="input" [(ngModel)]="codigoBuscado" placeholder="Ingresa el codigo de barras y presiona enter o escanea el codigo" (keyup.enter)="onEnterPressed()">
-            <div *ngIf="valid" class="error-code"><p>Has ingresado un codigo que no existe </p></div>
-            <div *ngIf="validProduct" class="error-code"><p>Ya has ingresado este producto, solo cambia la cantidad</p></div>
-            <div *ngIf="existProduct" class="error-code"><p>Este producto no tiene existencias en el almacen</p></div>
-           </div>
+                <div class="variantes-container">
+                    <label class="label">Selecciona una variante:</label>
+                    <div class="variantes-grid">
+                        <div 
+                            *ngFor="let variante of productoEncontrado.variantes" 
+                            class="variante-card"
+                            [class.selected]="varianteSeleccionada?.id === variante.id"
+                            [class.no-stock]="variante.existente_en_almacen === 0"
+                            (click)="onVarianteSelected(variante)">
+                            
+                            <div class="variante-info">
+                                <div class="variante-header">
+                                    <span class="variante-sku">{{variante.sku}}</span>
+                                    <span class="variante-stock" 
+                                          [class.stock-zero]="variante.existente_en_almacen === 0">
+                                        Stock: {{variante.existente_en_almacen}}
+                                    </span>
+                                </div>
+                                
+                                <div class="variante-details">
+                                    <span *ngIf="variante.color" class="variante-color">
+                                        <i class="fa-solid fa-circle" [style.color]="variante.color.codigo_hex || '#ccc'"></i>
+                                        {{variante.color.nombre}}
+                                    </span>
+                                    <span *ngIf="variante.talla" class="variante-talla">
+                                        <i class="fa-solid fa-tag"></i>
+                                        {{variante.talla.nombre}}
+                                    </span>
+                                </div>
+                                
+                                <div class="variante-precio">
+                                    <!-- ✅ CORREGIDO: Usar método que convierte a número -->
+                                    ${{getVariantePrecio(variante) | customNumber}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="variante-actions">
+                        <button 
+                            type="button"
+                            class="btn-agregar"
+                            [disabled]="!varianteSeleccionada || varianteSeleccionada.existente_en_almacen === 0"
+                            (click)="onAgregarProducto()">
+                            <i class="fa-solid fa-plus"></i>
+                            Agregar al carrito
+                        </button>
+                        <button 
+                            type="button"
+                            class="btn-cancelar"
+                            (click)="resetSelection()">
+                            <i class="fa-solid fa-times"></i>
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOTAL -->
             <p class="label-title">Total: ${{total() | customNumber}}</p>
 
-            <div class="table-responsive">
+            <!-- TABLA DE PRODUCTOS AGREGADOS -->
+            <div *ngIf="productosFiltrados.length > 0" class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Codigo</th>
-                            <th>Existencia</th>
+                            <th>Producto</th>
+                            <th>SKU</th>
+                            <th>Color</th>
+                            <th>Talla</th>
+                            <th>Stock</th>
                             <th>Cantidad</th>
                             <th>Descuento</th>
-                            <th>Precio</th>
+                            <th>Precio Unit.</th>
                             <th>Total</th>
                             <th>Eliminar</th>
-
                         </tr>
                     </thead>
                     <tbody *ngFor="let data of productosFiltrados | paginate: { itemsPerPage: 5, currentPage: p }; let i = index">
                         <tr>
-                            <td>{{data.denominacion}}</td>
-                            <td>{{data.codigo}}</td>
-                            <td>{{data.existente_en_almacen}}</td>
-                            <td><input class="input-quantiti" style="width: 40px;" type="number" [(ngModel)]="quantities[i]" (input)="onCantidadChange(data,i)"></td>
                             <td>
-                            <!-- <select style="border: none; width: 50px; padding: 8px 0; border-radius: 5px;" [(ngModel)]="porcentaje[i]"  (change)="onPorcentajeChange(data,i)">
-                                <option value="" hidden>...</option>
-                                <option *ngFor="let item of arraySelects.selects" [value]="item.value">{{item.name}}%</option>
-                            </select> -->
-                            <input class="input-quantiti" style="width: 100px;" type="text" placeholder="Ingresa des..." [(ngModel)]="porcentaje[i]" (input)="onPorcentajeChange(data,i)" appFormatoNumerico> $
+                                <div class="producto-cell">
+                                    <strong>{{data.denominacion}}</strong>
+                                    <small>{{data.codigo}}</small>
+                                </div>
                             </td>
-                            <td>{{data.precio_por_unidad | customNumber}}</td>
-                            <td>{{data.total | customNumber}}</td>
-                            <td style="color: red; font-size: 18px; cursor: pointer;"><span (click)="onDeleteProducto(data)"><i class="fa-solid fa-trash-can"></i></span></td>
+                            <td><span class="sku-badge">{{data.sku_variante}}</span></td>
+                            <td>
+                                <span *ngIf="data.color_nombre" class="color-info">
+                                    <i class="fa-solid fa-circle" 
+                                       [style.color]="data.variante_seleccionada?.color?.codigo_hex || '#ccc'"></i>
+                                    {{data.color_nombre}}
+                                </span>
+                                <span *ngIf="!data.color_nombre" class="no-info">-</span>
+                            </td>
+                            <td>
+                                <span *ngIf="data.talla_nombre" class="talla-badge">{{data.talla_nombre}}</span>
+                                <span *ngIf="!data.talla_nombre" class="no-info">-</span>
+                            </td>
+                            <td>
+                                <!-- ✅ CORREGIDO: Ya no puede ser undefined -->
+                                <span class="stock-info" 
+                                      [class.stock-low]="data.stock_disponible < 5">
+                                    {{data.stock_disponible}}
+                                </span>
+                            </td>
+                            <td>
+                                <input 
+                                    class="input-quantiti" 
+                                    style="width: 60px;" 
+                                    type="number" 
+                                    min="1"
+                                    [max]="data.stock_disponible"
+                                    [(ngModel)]="quantities[i]" 
+                                    (input)="onCantidadChange(data,i)">
+                            </td>
+                            <td>
+                                <input 
+                                    class="input-quantiti" 
+                                    style="width: 100px;" 
+                                    type="text" 
+                                    placeholder="Descuento..." 
+                                    [(ngModel)]="porcentaje[i]" 
+                                    (input)="onPorcentajeChange(data,i)" 
+                                    appFormatoNumerico>
+                                <small>$</small>
+                            </td>
+                            <td>${{data.precio_por_unidad | customNumber}}</td>
+                            <td><strong>${{data.total | customNumber}}</strong></td>
+                            <td>
+                                <button 
+                                    type="button"
+                                    class="btn-delete"
+                                    (click)="onDeleteProducto(data)">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
+            <!-- PAGINACIÓN -->
             <pagination-controls
-            class="my-pagination"
-            [directionLinks]="false"
-            (pageChange)="p = $event"
-            previousLabel="Anterior"
-            nextLabel="Siguiente"
-            [maxSize]="5"
-            [responsive]="true"
-            ></pagination-controls>
+                *ngIf="productosFiltrados.length > 5"
+                class="my-pagination"
+                [directionLinks]="false"
+                (pageChange)="p = $event"
+                previousLabel="Anterior"
+                nextLabel="Siguiente"
+                [maxSize]="5"
+                [responsive]="true">
+            </pagination-controls>
 
-
-            <form *ngIf="isItemsArrayValid()" (ngSubmit)="getSubmit()" [formGroup]="saleForm" class="page slide-page flash">
-
-                <div class="content-inputs">
-                    <app-input [form]="saleForm" [arrayInput]="arrayInput1">
-                    </app-input>
-                    <app-input [form]="saleForm" [arrayInput]="arrayInput2">
-                    </app-input>
+            <!-- FORMULARIO DE VENTA -->
+            <form *ngIf="isItemsArrayValid()" (ngSubmit)="getSubmit()" [formGroup]="saleForm" class="sale-form">
+                <div class="form-header-section">
+                    <h3>Información del Cliente</h3>
                 </div>
 
+                <div class="content-inputs">
+                    <app-input [form]="saleForm" [arrayInput]="arrayInput1"></app-input>
+                    <app-input [form]="saleForm" [arrayInput]="arrayInput2"></app-input>
+                </div>
+
+                <div class="form-summary">
+                    <div class="summary-item">
+                        <span>Productos diferentes:</span>
+                        <strong>{{productosFiltrados.length}}</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Cantidad total:</span>
+                        <!-- ✅ CORREGIDO: Usar método del componente -->
+                        <strong>{{calcularCantidadTotal()}}</strong>
+                    </div>
+                    <div class="summary-item total-final">
+                        <span>Total final:</span>
+                        <strong>${{total() | customNumber}}</strong>
+                    </div>
+                </div>
 
                 <div class="form-button">
                     <app-button [label]="'Generar venta'" [myForm]="saleForm"></app-button>
                 </div>
-
             </form>
 
-
-
-
+            <!-- MENSAJE CUANDO NO HAY PRODUCTOS -->
+            <div *ngIf="!isItemsArrayValid() && !productoEncontrado" class="empty-cart">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-shopping-cart"></i>
+                </div>
+                <h3>Carrito vacío</h3>
+                <p>Busca productos por código de barras para comenzar</p>
+            </div>
         </div>
     </div>
 </div>
-
-
-
