@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "acr_plus_clients_view": {
+    "studio_yez_app_frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/acr_plus_clients_view",
+            "outputPath": "dist/studio_yez_app_frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -65,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "acr_plus_clients_view:build:production"
+              "buildTarget": "studio_yez_app_frontend:build:production"
             },
             "development": {
-              "buildTarget": "acr_plus_clients_view:build:development"
+              "buildTarget": "studio_yez_app_frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "acr_plus_clients_view:build"
+            "buildTarget": "studio_yez_app_frontend:build"
           }
         },
         "test": {

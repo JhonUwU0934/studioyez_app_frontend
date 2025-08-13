@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'acr_plus_clients_view'`, () => {
+  it(`should have as title 'studio_yez_app_frontend'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('acr_plus_clients_view');
+    expect(app.title).toEqual('studio_yez_app_frontend');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('acr_plus_clients_view app is running!');
+    expect(compiled.querySelector('.content span')?.textContent).toContain('studio_yez_app_frontend app is running!');
   });
 });
