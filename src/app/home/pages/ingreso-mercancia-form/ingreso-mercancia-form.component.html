@@ -1,50 +1,398 @@
-<div class="container">
+<div class="products-form-container">
+  <!-- Header del formulario -->
+  <div class="form-header">
+    <h2 class="form-title">
+      <i class="fas fa-box-open"></i>
+      Agregar Ingreso de Mercancía
+    </h2>
+    
+    <div class="header-actions">
+      <!-- Botón temporal de debug -->
+      <button type="button" class="btn-debug" (click)="debug()" style="background: #ffc107; color: #000; margin-right: 10px; padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px;">
+        Debug 🐛
+      </button>
+      
+      <button type="button" class="btn-back" (click)="doSomething()">
+        <i class="fas fa-arrow-left"></i>
+        Volver
+      </button>
+    </div>
+  </div>
 
-  <div class="container-left">
-      <span (click)="doSomething()" class="back">
-          <i class="fa-solid fa-arrow-left"></i>
-      </span>
-      <form (ngSubmit)="getSubmit()" [formGroup]="productForm" class="page slide-page flash">
-
-          <div class="form_header">
-              <div class="form_title">
-                  <h2>Agregar Producto</h2>
+  <!-- Contenido del formulario -->
+  <div class="form-content" *ngIf="!isLoading" (click)="closeDropdowns()">
+    <form [formGroup]="productForm" (ngSubmit)="getSubmit()" class="product-form">
+      
+      <!-- Selección de Producto -->
+      <div class="form-section" (click)="$event.stopPropagation()">
+        <h3 class="section-title">
+          <i class="fas fa-cube"></i>
+          Seleccionar Producto Base
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="producto" class="form-label required">Producto</label>
+            
+            <!-- Input de búsqueda para productos optimizado -->
+            <div class="search-select-container">
+              <div class="search-input-wrapper">
+                <input
+                  type="text"
+                  [ngModel]="filtroProducto"
+                  (ngModelChange)="onFiltroProductoChange($event)"
+                  (focus)="toggleDropdownProductos(true)"
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Buscar producto por nombre o código..."
+                  class="search-input"
+                  autocomplete="off">
+                
+                <div class="search-actions">
+                  <button type="button" 
+                          class="clear-btn" 
+                          *ngIf="filtroProducto"
+                          (click)="limpiarFiltroProducto()">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  <button type="button" 
+                          class="dropdown-btn"
+                          (click)="toggleDropdownProductos()">
+                    <i class="fas fa-chevron-down" 
+                       [class.rotated]="(mostrarDropdownProductos$ | async)"></i>
+                  </button>
+                </div>
               </div>
-          </div>
 
-
-
-          <div class="content-inputs">
-            <br>
-            <span>SELECCIONA PRODUCTO</span>
-            <select class="select-productos" (change)="seleccionarProducto($event)">
-              <option *ngFor="let item of products" [value]="item.id">
-                {{ item.denominacion }}
-              </option>
-            </select>
-
-
-            <div *ngIf="products.length === 0">
-              No products available.
+              <!-- Dropdown de productos filtrados optimizado -->
+              <div class="dropdown-results" 
+                   *ngIf="(mostrarDropdownProductos$ | async)" 
+                   (click)="$event.stopPropagation()">
+                
+                <ng-container *ngIf="(productosFiltrados$ | async) as productosFiltrados">
+                  <div class="results-header" *ngIf="productosFiltrados.length > 0">
+                    {{ productosFiltrados.length }} producto(s) encontrado(s)
+                  </div>
+                  
+                  <div class="results-list">
+                    <div class="result-item"
+                         *ngFor="let producto of productosFiltrados; trackBy: trackByProductoId"
+                         (click)="seleccionarProductoFiltrado(producto)"
+                         [class.selected]="productoSeleccionado?.id === producto.id">
+                      <div class="item-main">
+                        <span class="item-name">{{ producto.denominacion }}</span>
+                        <span class="item-code">{{ producto.codigo }}</span>
+                      </div>
+                      <div class="item-details">
+                        <span class="stock-info">Stock: {{ producto.existente_en_almacen || 0 }}</span>
+                        <span class="variant-info" *ngIf="producto.tiene_variantes">
+                          <i class="fas fa-layer-group"></i> Con variantes
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div class="no-results" *ngIf="productosFiltrados.length === 0">
+                      <i class="fas fa-search"></i>
+                      <p>No se encontraron productos</p>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
             </div>
-
-
-              <app-input [form]="productForm" [arrayInput]="arrayInput3">
-              </app-input>
+            
+            <small class="field-help" *ngIf="(productos$ | async)?.length === 0">
+              No hay productos disponibles
+            </small>
           </div>
+        </div>
 
-          <div class="content-inputs">
-              <app-input [form]="productForm" [arrayInput]="arrayInput4">
-              </app-input>
+        <!-- Información del producto seleccionado -->
+        <div class="product-info" *ngIf="productoSeleccionado">
+          <div class="info-card">
+            <div class="info-header">
+              <i class="fas fa-info-circle"></i>
+              <span>Información del Producto</span>
+            </div>
+            <div class="info-content">
+              <div class="info-item">
+                <label>Código:</label>
+                <span>{{ productoSeleccionado?.codigo }}</span>
+              </div>
+              <div class="info-item">
+                <label>Stock Base:</label>
+                <span class="stock-badge" [class.stock-low]="(productoSeleccionado?.existente_en_almacen || 0) < 10">
+                  {{ productoSeleccionado?.existente_en_almacen || 0 }} unidades
+                </span>
+              </div>
+              <div class="info-item" *ngIf="productoSeleccionado?.tiene_variantes">
+                <label>Tiene Variantes:</label>
+                <span class="variant-badge">
+                  <i class="fas fa-layer-group"></i>
+                  Sí ({{ (variantes$ | async)?.length || 0 }} disponibles)
+                </span>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
 
-
-          <div class="form-button">
-              <app-button [label]="'Guardar'" [myForm]="productForm"></app-button>
-              <!-- <app-button-click [label]="'Ver todas'" [buttonMethod]="doSomething"></app-button-click> -->
+      <!-- Selección de Tipo de Ingreso (solo si el producto tiene variantes) -->
+      <div class="form-section" *ngIf="productoSeleccionado?.tiene_variantes && !cargandoVariantes" (click)="$event.stopPropagation()">
+        <h3 class="section-title">
+          <i class="fas fa-route"></i>
+          Tipo de Ingreso
+        </h3>
+        
+        <div class="tipo-ingreso-selector">
+          <div class="tipo-option" 
+               [class.selected]="tipoIngreso === 'producto'"
+               (click)="seleccionarTipoIngreso('producto')">
+            <div class="option-icon">
+              <i class="fas fa-cube"></i>
+            </div>
+            <div class="option-content">
+              <h4>Producto Base</h4>
+              <p>Ingresar al stock general del producto</p>
+              <div class="current-stock">
+                Stock actual: {{ productoSeleccionado?.existente_en_almacen || 0 }} unidades
+              </div>
+            </div>
           </div>
+          
+          <div class="tipo-option" 
+               [class.selected]="tipoIngreso === 'variante'"
+               (click)="seleccionarTipoIngreso('variante')">
+            <div class="option-icon">
+              <i class="fas fa-layer-group"></i>
+            </div>
+            <div class="option-content">
+              <h4>Variante Específica</h4>
+              <p>Ingresar a una variante específica (color/talla)</p>
+              <div class="variants-count">
+                {{ (variantes$ | async)?.length || 0 }} variantes disponibles
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      </form>
+      <!-- Selección de Variante (solo si se eligió tipo 'variante') -->
+      <div class="form-section" *ngIf="tipoIngreso === 'variante' && productoSeleccionado?.tiene_variantes && !cargandoVariantes" (click)="$event.stopPropagation()">
+        <h3 class="section-title">
+          <i class="fas fa-layer-group"></i>
+          Seleccionar Variante Específica
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="variante" class="form-label required">Variante</label>
+            
+            <!-- Input de búsqueda para variantes optimizado -->
+            <div class="search-select-container">
+              <div class="search-input-wrapper">
+                <input
+                  type="text"
+                  [ngModel]="filtroVariante"
+                  (ngModelChange)="onFiltroVarianteChange($event)"
+                  (focus)="toggleDropdownVariantes(true)"
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Buscar variante por SKU, color o talla..."
+                  class="search-input"
+                  autocomplete="off">
+                
+                <div class="search-actions">
+                  <button type="button" 
+                          class="clear-btn" 
+                          *ngIf="filtroVariante"
+                          (click)="limpiarFiltroVariante()">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  <button type="button" 
+                          class="dropdown-btn"
+                          (click)="toggleDropdownVariantes()">
+                    <i class="fas fa-chevron-down" 
+                       [class.rotated]="(mostrarDropdownVariantes$ | async)"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dropdown de variantes filtradas optimizado -->
+              <div class="dropdown-results" 
+                   *ngIf="(mostrarDropdownVariantes$ | async)" 
+                   (click)="$event.stopPropagation()">
+                
+                <ng-container *ngIf="(variantesFiltradas$ | async) as variantesFiltradas">
+                  <div class="results-header" *ngIf="variantesFiltradas.length > 0">
+                    {{ variantesFiltradas.length }} variante(s) encontrada(s)
+                  </div>
+                  
+                  <div class="results-list">
+                    <div class="result-item variant-item"
+                         *ngFor="let variante of variantesFiltradas; trackBy: trackByVarianteId"
+                         (click)="seleccionarVarianteFiltrada(variante)"
+                         [class.selected]="varianteSeleccionada?.id === variante.id">
+                      <div class="item-main">
+                        <span class="item-name">{{ variante.nombre_display }}</span>
+                        <span class="item-sku" *ngIf="variante.sku">{{ variante.sku }}</span>
+                      </div>
+                      <div class="item-details">
+                        <span class="color-info" *ngIf="variante.color">
+                          <div class="color-dot" [style.background-color]="variante.color.codigo_hex"></div>
+                          {{ variante.color.nombre }}
+                        </span>
+                        <span class="size-info" *ngIf="variante.talla">
+                          <i class="fas fa-ruler"></i> {{ variante.talla.nombre }}
+                        </span>
+                        <span class="stock-info">Stock: {{ variante.existente_en_almacen }}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="no-results" *ngIf="variantesFiltradas.length === 0">
+                      <i class="fas fa-search"></i>
+                      <p>No se encontraron variantes</p>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+            
+            <small class="field-help">
+              Selecciona la variante específica para el ingreso
+            </small>
+          </div>
+        </div>
+
+        <!-- Información de la variante seleccionada -->
+        <div class="variant-info" *ngIf="varianteSeleccionada">
+          <div class="info-card variant-card">
+            <div class="info-header">
+              <i class="fas fa-tag"></i>
+              <span>Variante Seleccionada</span>
+            </div>
+            <div class="info-content">
+              <div class="info-item" *ngIf="varianteSeleccionada.sku">
+                <label>SKU:</label>
+                <span class="sku-code">{{ varianteSeleccionada.sku }}</span>
+              </div>
+              <div class="info-item" *ngIf="varianteSeleccionada.color">
+                <label>Color:</label>
+                <span class="color-info">
+                  <div 
+                    class="color-swatch" 
+                    [style.background-color]="varianteSeleccionada.color.codigo_hex">
+                  </div>
+                  {{ varianteSeleccionada.color.nombre }}
+                </span>
+              </div>
+              <div class="info-item" *ngIf="varianteSeleccionada.talla">
+                <label>Talla:</label>
+                <span class="size-badge">{{ varianteSeleccionada.talla.nombre }}</span>
+              </div>
+              <div class="info-item">
+                <label>Stock Actual:</label>
+                <span class="stock-badge" [class.stock-low]="varianteSeleccionada.existente_en_almacen < 10">
+                  {{ varianteSeleccionada.existente_en_almacen }} unidades
+                </span>
+              </div>
+              <div class="info-item" *ngIf="varianteSeleccionada.precio_por_unidad">
+                <label>Precio por Unidad:</label>
+                <span class="price-badge">${{ varianteSeleccionada.precio_por_unidad }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading de variantes -->
+      <div class="form-section" *ngIf="cargandoVariantes" (click)="$event.stopPropagation()">
+        <div class="loading-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Cargando variantes del producto...</p>
+        </div>
+      </div>
+
+      <!-- Detalles del Ingreso -->
+      <div class="form-section" *ngIf="tieneSeleccionValida()" (click)="$event.stopPropagation()">
+        <h3 class="section-title">
+          <i class="fas fa-clipboard-list"></i>
+          Detalles del Ingreso
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <app-input [form]="productForm" [arrayInput]="arrayInput3"></app-input>
+          </div>
+          
+          <div class="form-group">
+            <app-input [form]="productForm" [arrayInput]="arrayInput4"></app-input>
+          </div>
+        </div>
+
+        <!-- Resumen del ingreso -->
+        <div class="ingreso-summary" *ngIf="productForm.get('cantidad')?.value && getNombreCompleto()">
+          <div class="summary-card">
+            <div class="summary-header">
+              <i class="fas fa-receipt"></i>
+              <span>Resumen del Ingreso</span>
+            </div>
+            <div class="summary-content">
+              <div class="summary-item">
+                <label>Tipo de Ingreso:</label>
+                <span class="type-badge" [class.type-product]="tipoIngreso === 'producto'" [class.type-variant]="tipoIngreso === 'variante'">
+                  <i class="fas fa-cube" *ngIf="tipoIngreso === 'producto'"></i>
+                  <i class="fas fa-layer-group" *ngIf="tipoIngreso === 'variante'"></i>
+                  {{ tipoIngreso === 'producto' ? 'Producto Base' : 'Variante Específica' }}
+                </span>
+              </div>
+              <div class="summary-item">
+                <label>Item:</label>
+                <span>{{ getNombreCompleto() }}</span>
+              </div>
+              <div class="summary-item" *ngIf="getSkuMostrar()">
+                <label>SKU/Código:</label>
+                <span class="sku-code">{{ getSkuMostrar() }}</span>
+              </div>
+              <div class="summary-item">
+                <label>Cantidad a Ingresar:</label>
+                <span class="quantity-highlight">{{ productForm.get('cantidad')?.value }} unidades</span>
+              </div>
+              <div class="summary-item">
+                <label>Stock Actual:</label>
+                <span>{{ getStockActual() }} unidades</span>
+              </div>
+              <div class="summary-item">
+                <label>Stock Después del Ingreso:</label>
+                <span class="new-stock">{{ getStockActual() + (productForm.get('cantidad')?.value || 0) }} unidades</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="form-actions" *ngIf="productoSeleccionado" (click)="$event.stopPropagation()">
+        <button type="button" class="btn-cancel" (click)="doSomething()">
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
+        
+        <button 
+          type="submit" 
+          class="btn-submit" 
+          [disabled]="productForm.invalid || isLoading || !tieneSeleccionValida()"
+          [class.loading]="isLoading">
+          <i class="fas fa-save" *ngIf="!isLoading"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+          {{ isLoading ? 'Guardando...' : 'Registrar Ingreso' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Registrando ingreso de mercancía...</p>
+    </div>
   </div>
 </div>
-

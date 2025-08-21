@@ -25,14 +25,14 @@
                 <div *ngIf="valid" class="error-code">
                     <p>Has ingresado un código que no existe</p>
                 </div>
-                <div *ngIf="validProduct" class="error-code">
-                    <p>Ya has ingresado este producto con esta variante</p>
-                </div>
                 <div *ngIf="existProduct" class="error-code">
                     <p>Esta variante no tiene existencias en el almacén</p>
                 </div>
                 <div *ngIf="noVariantes" class="error-code">
                     <p>Este producto no tiene variantes configuradas</p>
+                </div>
+                <div *ngIf="cantidadExcedida" class="error-code">
+                    <p>La cantidad solicitada excede el stock disponible</p>
                 </div>
             </div>
 
@@ -74,10 +74,44 @@
                                 </div>
                                 
                                 <div class="variante-precio">
-                                    <!-- ✅ CORREGIDO: Usar método que convierte a número -->
                                     ${{getVariantePrecio(variante) | customNumber}}
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- NUEVA SECCIÓN: CANTIDAD A AGREGAR -->
+                    <div *ngIf="varianteSeleccionada" class="cantidad-section">
+                        <div class="cantidad-input-container">
+                            <label class="label">Cantidad:</label>
+                            <div class="cantidad-controls">
+                                <button 
+                                    type="button" 
+                                    class="btn-cantidad" 
+                                    (click)="decrementarCantidad()"
+                                    [disabled]="cantidadAAgregar <= 1">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                                <input 
+                                    type="number" 
+                                    class="input-cantidad" 
+                                    [(ngModel)]="cantidadAAgregar"
+                                    [min]="1"
+                                    [max]="getMaxCantidadDisponible()"
+                                    (input)="onCantidadInputChange()"
+                                    (blur)="validarCantidad()">
+                                <button 
+                                    type="button" 
+                                    class="btn-cantidad" 
+                                    (click)="incrementarCantidad()"
+                                    [disabled]="cantidadAAgregar >= getMaxCantidadDisponible()">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <small class="cantidad-info">
+                                Disponible: {{getMaxCantidadDisponible()}} | 
+                                Total: ${{(getVariantePrecio(varianteSeleccionada) * cantidadAAgregar) | customNumber}}
+                            </small>
                         </div>
                     </div>
 
@@ -85,10 +119,10 @@
                         <button 
                             type="button"
                             class="btn-agregar"
-                            [disabled]="!varianteSeleccionada || varianteSeleccionada.existente_en_almacen === 0"
+                            [disabled]="!varianteSeleccionada || varianteSeleccionada.existente_en_almacen === 0 || cantidadAAgregar > getMaxCantidadDisponible()"
                             (click)="onAgregarProducto()">
                             <i class="fa-solid fa-plus"></i>
-                            Agregar al carrito
+                            Agregar {{cantidadAAgregar || 1}} al carrito
                         </button>
                         <button 
                             type="button"
@@ -143,7 +177,6 @@
                                 <span *ngIf="!data.talla_nombre" class="no-info">-</span>
                             </td>
                             <td>
-                                <!-- ✅ CORREGIDO: Ya no puede ser undefined -->
                                 <span class="stock-info" 
                                       [class.stock-low]="data.stock_disponible < 5">
                                     {{data.stock_disponible}}
@@ -208,6 +241,185 @@
                     <app-input [form]="saleForm" [arrayInput]="arrayInput2"></app-input>
                 </div>
 
+                <!-- NUEVA SECCIÓN: PAGO COMBINADO + CRÉDITO -->
+                <div class="pago-combinado-section">
+                    <div class="form-header-section">
+                        <h3>Métodos de Pago</h3>
+                        <p class="pago-subtitle">El cliente puede pagar con efectivo, transferencia, crédito o combinando métodos</p>
+                    </div>
+                    
+                    <div class="pago-grid">
+                        <!-- EFECTIVO -->
+                        <div class="pago-method-card efectivo">
+                            <div class="method-header">
+                                <div class="method-icon">
+                                    <i class="fa-solid fa-money-bills"></i>
+                                </div>
+                                <h4>Efectivo</h4>
+                            </div>
+                            <div class="method-input">
+                                <div class="input-container">
+                                    <span class="currency">$</span>
+                                    <input 
+                                        type="number" 
+                                        formControlName="valor_efectivo"
+                                        class="payment-input"
+                                        [min]="0"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        (input)="onValorEfectivoChange()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TRANSFERENCIA -->
+                        <div class="pago-method-card transferencia">
+                            <div class="method-header">
+                                <div class="method-icon">
+                                    <i class="fa-solid fa-credit-card"></i>
+                                </div>
+                                <h4>Transferencia</h4>
+                            </div>
+                            <div class="method-input">
+                                <div class="input-container">
+                                    <span class="currency">$</span>
+                                    <input 
+                                        type="number" 
+                                        formControlName="valor_transferencia"
+                                        class="payment-input"
+                                        [min]="0"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        (input)="onValorTransferenciaChange()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CRÉDITO -->
+                        <div class="pago-method-card credito">
+                            <div class="method-header">
+                                <div class="method-icon">
+                                    <i class="fa-solid fa-calendar-alt"></i>
+                                </div>
+                                <h4>Crédito</h4>
+                            </div>
+                            <div class="method-input">
+                                <div class="input-container">
+                                    <span class="currency">$</span>
+                                    <input 
+                                        type="number" 
+                                        formControlName="valor_credito"
+                                        class="payment-input"
+                                        [min]="0"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        (input)="onValorCreditoChange()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FECHA DE PROMESA (solo si hay crédito) -->
+                    <div *ngIf="valorCredito > 0" class="fecha-promesa-section">
+                        <div class="fecha-promesa-container">
+                            <label class="label">Fecha de promesa de pago:</label>
+                            <input 
+                                type="date" 
+                                formControlName="fecha_promesa_pago"
+                                class="fecha-input"
+                                [min]="getFechaMinima()"
+                                [max]="getFechaMaxima()"
+                                (change)="onFechaPromesaChange()">
+                            <small class="fecha-info">
+                                El cliente se compromete a pagar el crédito en esta fecha
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- RESUMEN DE PAGO -->
+                    <div class="pago-summary">
+                        <div class="summary-row total-venta">
+                            <span class="label">Total de la venta:</span>
+                            <span class="value total">${{total() | customNumber}}</span>
+                        </div>
+                        
+                        <div class="summary-row total-pagado">
+                            <span class="label">Total comprometido:</span>
+                            <span class="value pagado" [class.insuficiente]="pagoInsuficiente">
+                                ${{totalPagado() | customNumber}}
+                            </span>
+                        </div>
+
+                        <div *ngIf="getTotalRestante() > 0" class="summary-row restante">
+                            <span class="label">Falta por comprometer:</span>
+                            <span class="value falta">${{getTotalRestante() | customNumber}}</span>
+                        </div>
+
+                        <div *ngIf="valorDevuelto() > 0" class="summary-row cambio">
+                            <span class="label">Cambio a devolver:</span>
+                            <span class="value cambio-amount">${{valorDevuelto() | customNumber}}</span>
+                        </div>
+
+                        <!-- MENSAJE DE ERROR -->
+                        <div *ngIf="pagoInsuficiente" class="error-code">
+                            <p>El total comprometido es insuficiente para completar la venta</p>
+                        </div>
+
+                        <!-- NUEVO: Errores de validación del formulario -->
+                        <div *ngIf="saleForm.hasError('pagoInsuficiente')" class="error-code">
+                            <p>El total comprometido debe ser mayor o igual al total de la venta</p>
+                        </div>
+
+                        <div *ngIf="saleForm.hasError('noProductos')" class="error-code">
+                            <p>Debe agregar productos al carrito antes de procesar el pago</p>
+                        </div>
+
+                        <div *ngIf="saleForm.hasError('fechaPromesaRequerida')" class="error-code">
+                            <p>Debe especificar la fecha de promesa de pago para ventas a crédito</p>
+                        </div>
+
+                        <div *ngIf="saleForm.hasError('fechaPromesaInvalida')" class="error-code">
+                            <p>La fecha de promesa de pago debe ser una fecha futura</p>
+                        </div>
+
+                        <div *ngIf="saleForm.hasError('fechaPromesaMuyLejana')" class="error-code">
+                            <p>El crédito no puede exceder 6 meses</p>
+                        </div>
+                    </div>
+
+                    <!-- BOTONES DE ACCESO RÁPIDO -->
+                    <div class="quick-payment-buttons">
+                        <button 
+                            type="button" 
+                            class="quick-btn solo-efectivo"
+                            (click)="pagarSoloEfectivo()">
+                            <i class="fa-solid fa-money-bills"></i>
+                            Solo Efectivo
+                        </button>
+                        <button 
+                            type="button" 
+                            class="quick-btn solo-transferencia"
+                            (click)="pagarSoloTransferencia()">
+                            <i class="fa-solid fa-credit-card"></i>
+                            Solo Transferencia
+                        </button>
+                        <button 
+                            type="button" 
+                            class="quick-btn solo-credito"
+                            (click)="pagarSoloCredito()">
+                            <i class="fa-solid fa-calendar-alt"></i>
+                            Solo Crédito
+                        </button>
+                        <button 
+                            type="button" 
+                            class="quick-btn mitad-mitad"
+                            (click)="pagarMitadMitad()">
+                            <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                            50% - 50%
+                        </button>
+                    </div>
+                </div>
+
                 <div class="form-summary">
                     <div class="summary-item">
                         <span>Productos diferentes:</span>
@@ -215,7 +427,6 @@
                     </div>
                     <div class="summary-item">
                         <span>Cantidad total:</span>
-                        <!-- ✅ CORREGIDO: Usar método del componente -->
                         <strong>{{calcularCantidadTotal()}}</strong>
                     </div>
                     <div class="summary-item total-final">
@@ -225,7 +436,10 @@
                 </div>
 
                 <div class="form-button">
-                    <app-button [label]="'Generar venta'" [myForm]="saleForm"></app-button>
+                    <app-button 
+                        [label]="'Generar venta'" 
+                        [myForm]="saleForm">
+                    </app-button>
                 </div>
             </form>
 

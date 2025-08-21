@@ -88,6 +88,461 @@ app-button-click {
     font-weight: 600;
 }
 
+// ✅ SISTEMA DE FILTROS - ESTILOS COMPLETOS
+
+// CONTENEDOR PRINCIPAL DE FILTROS
+.filtros-container {
+    background-color: var(--sidebar-color-fondo);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+// TÍTULO Y FILTROS RÁPIDOS
+.filtros-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+
+    i {
+        color: var(--primary-color-neutro);
+        font-size: 18px;
+    }
+
+    .contador-filtros {
+        background-color: var(--primary-color-neutro);
+        color: white;
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: 700;
+        min-width: 18px;
+        text-align: center;
+    }
+}
+
+// GRID DE FILTROS RÁPIDOS
+.filtros-rapidos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+// BOTONES DE FILTROS RÁPIDOS
+.btn-filtro-rapido {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    background-color: var(--color-fondo);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--color-text);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    min-height: 80px;
+    justify-content: center;
+    gap: 4px;
+
+    &:hover {
+        border-color: var(--primary-color-neutro);
+        background-color: rgba(var(--primary-color-neutro-rgb), 0.05);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.activo {
+        border-color: var(--primary-color-neutro);
+        background-color: rgba(var(--primary-color-neutro-rgb), 0.1);
+        color: var(--primary-color-neutro);
+        font-weight: 600;
+    }
+
+    i {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    span {
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    small {
+        font-size: 10px;
+        opacity: 0.8;
+        font-weight: 700;
+        background-color: rgba(var(--primary-color-neutro-rgb), 0.1);
+        padding: 2px 6px;
+        border-radius: 8px;
+        margin-top: 2px;
+    }
+}
+
+// COLORES ESPECÍFICOS PARA DIFERENTES TIPOS DE FILTROS
+.btn-creditos-pendientes {
+    &:hover, &.activo {
+        border-color: #ffc107;
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+
+        i { color: #ffc107; }
+    }
+}
+
+.btn-creditos-vencidos {
+    &:hover, &.activo {
+        border-color: #dc3545;
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+
+        i { color: #dc3545; }
+        small { animation: pulse-red 2s infinite; }
+    }
+}
+
+.btn-por-vencer {
+    &:hover, &.activo {
+        border-color: #ff9800;
+        background-color: rgba(255, 152, 0, 0.1);
+        color: #ff9800;
+
+        i { color: #ff9800; }
+    }
+}
+
+.btn-ventas-hoy {
+    &:hover, &.activo {
+        border-color: #2196f3;
+        background-color: rgba(33, 150, 243, 0.1);
+        color: #2196f3;
+
+        i { color: #2196f3; }
+    }
+}
+
+.btn-con-variantes {
+    &:hover, &.activo {
+        border-color: #28a745;
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+
+        i { color: #28a745; }
+    }
+}
+
+.btn-pagos-mixtos {
+    &:hover, &.activo {
+        border-color: #6f42c1;
+        background-color: rgba(111, 66, 193, 0.1);
+        color: #6f42c1;
+
+        i { color: #6f42c1; }
+    }
+}
+
+// CONTROLES DE FILTROS
+.filtros-controles {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 15px 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.filtros-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.btn-toggle-avanzados {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--color-text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: var(--primary-color-neutro);
+        background-color: rgba(var(--primary-color-neutro-rgb), 0.05);
+    }
+
+    i {
+        font-size: 12px;
+        transition: transform 0.2s ease;
+    }
+}
+
+.filtros-activos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--color-text);
+    background-color: rgba(var(--primary-color-neutro-rgb), 0.05);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(var(--primary-color-neutro-rgb), 0.2);
+
+    .texto-filtros-activos {
+        flex: 1;
+        opacity: 0.9;
+    }
+}
+
+.btn-limpiar-filtros {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #c82333;
+        transform: scale(1.05);
+    }
+
+    i {
+        margin-right: 3px;
+    }
+}
+
+.filtros-acciones {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-exportar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--primary-color-neutro);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+        background-color: var(--primary-color-neutro);
+        filter: brightness(0.9);
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    i {
+        font-size: 11px;
+    }
+}
+
+// FILTROS AVANZADOS
+.filtros-avanzados {
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    margin-top: 20px;
+    animation: slideDown 0.3s ease;
+}
+
+.filtros-avanzados-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    &.filtro-rango {
+        grid-column: span 2;
+    }
+}
+
+.filtro-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 3px;
+}
+
+.filtro-select,
+.filtro-input {
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--color-fondo);
+    color: var(--color-text);
+    font-size: 13px;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s ease;
+
+    &:focus {
+        border-color: var(--primary-color-neutro);
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-neutro-rgb), 0.1);
+    }
+}
+
+.filtro-input-small {
+    flex: 1;
+    min-width: 80px;
+}
+
+.rango-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rango-separador {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.rango-info {
+    font-size: 10px;
+    color: var(--color-text);
+    opacity: 0.7;
+    margin-top: 3px;
+}
+
+// ESTADÍSTICAS FILTRADAS
+.estadisticas-filtradas {
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.estadisticas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.estadistica-card {
+    background-color: var(--color-fondo);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: var(--primary-color-neutro);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.credito-vencido {
+        border-color: #dc3545;
+        background-color: rgba(220, 53, 69, 0.05);
+
+        .estadistica-numero {
+            color: #dc3545;
+            animation: pulse-red 3s infinite;
+        }
+    }
+
+    .estadistica-numero {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary-color-neutro);
+        margin-bottom: 3px;
+    }
+
+    .estadistica-texto {
+        font-size: 11px;
+        color: var(--color-text);
+        opacity: 0.8;
+        font-weight: 500;
+    }
+}
+
+// SIN RESULTADOS
+.sin-resultados {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background-color: var(--sidebar-color-fondo);
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.sin-resultados-content {
+    text-align: center;
+    color: var(--color-text);
+
+    i {
+        font-size: 48px;
+        color: var(--primary-color-neutro);
+        opacity: 0.5;
+        margin-bottom: 15px;
+    }
+
+    h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    p {
+        font-size: 14px;
+        opacity: 0.8;
+        line-height: 1.5;
+        margin: 0;
+    }
+}
+
+.btn-limpiar-inline {
+    background: none;
+    border: none;
+    color: var(--primary-color-neutro);
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+
+    &:hover {
+        color: var(--primary-color-neutro);
+        filter: brightness(0.8);
+    }
+}
+
 // ESTILOS ACTUALIZADOS PARA LA TABLA CON VARIANTES
 table {
     border-collapse: collapse;
@@ -116,6 +571,7 @@ table {
             padding: 15px 10px;
         }
 
+        // ✅ NUEVOS ESTILOS PARA FILAS CON DIFERENTES ESTADOS DE CRÉDITO
         tr {
             &:nth-child(even) {
                 background-color: rgba(var(--sidebar-color-fondo), 0.3);
@@ -123,6 +579,45 @@ table {
 
             &:hover {
                 background-color: rgba(var(--primary-color-neutro-rgb), 0.05);
+            }
+
+            // ✅ NUEVO: Estilos para filas con crédito
+            &.credito-pendiente {
+                background-color: rgba(255, 193, 7, 0.1); // Amarillo suave
+                border-left: 4px solid #ffc107;
+
+                &:hover {
+                    background-color: rgba(255, 193, 7, 0.2);
+                }
+            }
+
+            &.credito-vencido {
+                background-color: rgba(220, 53, 69, 0.15); // Rojo suave
+                border-left: 4px solid #dc3545;
+                animation: pulse-red 3s infinite;
+
+                &:hover {
+                    background-color: rgba(220, 53, 69, 0.25);
+                }
+            }
+
+            &.credito-pagado {
+                background-color: rgba(40, 167, 69, 0.1); // Verde suave
+                border-left: 4px solid #28a745;
+
+                &:hover {
+                    background-color: rgba(40, 167, 69, 0.15);
+                }
+            }
+
+            &.credito-por-vencer {
+                background-color: rgba(255, 152, 0, 0.12); // Naranja suave
+                border-left: 4px solid #ff9800;
+                animation: pulse-orange 2s infinite;
+
+                &:hover {
+                    background-color: rgba(255, 152, 0, 0.2);
+                }
             }
         }
     }
@@ -210,6 +705,38 @@ table {
 
         i {
             font-size: 8px;
+        }
+    }
+
+    // ✅ NUEVO: Badge para crédito
+    .badge-credito {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-weight: 600;
+        margin-top: 3px;
+
+        i {
+            font-size: 8px;
+        }
+
+        &.credito-pendiente-badge {
+            background-color: #ffc107;
+            color: #856404;
+        }
+
+        &.credito-pagado-badge {
+            background-color: #28a745;
+            color: white;
+        }
+
+        &.credito-vencido-badge {
+            background-color: #dc3545;
+            color: white;
+            animation: pulse-red 2s infinite;
         }
     }
 }
@@ -407,6 +934,125 @@ table {
             font-size: 14px;
         }
     }
+
+    // ✅ NUEVOS: Estados específicos de crédito
+    .estado-credito-pagado {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        color: #28a745;
+        font-weight: 600;
+        font-size: 11px;
+        padding: 8px;
+        background-color: rgba(40, 167, 69, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+
+        i {
+            font-size: 14px;
+            margin-right: 3px;
+        }
+
+        small {
+            font-size: 9px;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+    }
+
+    .estado-credito-pendiente {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        color: #856404;
+        font-weight: 600;
+        font-size: 11px;
+        padding: 8px;
+        background-color: rgba(255, 193, 7, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+
+        i {
+            font-size: 14px;
+            margin-right: 3px;
+        }
+
+        small {
+            font-size: 9px;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .credito-vencimiento {
+            margin-top: 3px;
+            font-size: 9px;
+            font-weight: 500;
+
+            .vencido {
+                color: #dc3545;
+                font-weight: 700;
+                animation: pulse-red 2s infinite;
+
+                i {
+                    font-size: 10px;
+                    margin-right: 2px;
+                }
+            }
+
+            .por-vencer {
+                color: #ff9800;
+                font-weight: 600;
+
+                i {
+                    font-size: 9px;
+                    margin-right: 2px;
+                }
+            }
+
+            .vigente {
+                color: #17a2b8;
+                font-weight: 500;
+
+                i {
+                    font-size: 9px;
+                    margin-right: 2px;
+                }
+            }
+        }
+    }
+
+    .estado-mixto {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 10px;
+
+        .pago-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .efectivo-badge {
+                background-color: #28a745;
+                color: white;
+                padding: 1px 4px;
+                border-radius: 4px;
+                font-size: 9px;
+                font-weight: 600;
+            }
+
+            .transferencia-badge {
+                background-color: #2196f3;
+                color: white;
+                padding: 1px 4px;
+                border-radius: 4px;
+                font-size: 9px;
+                font-weight: 600;
+            }
+        }
+    }
 }
 
 .factura-cell {
@@ -483,6 +1129,129 @@ table {
 
             i {
                 font-size: 10px;
+            }
+        }
+    }
+}
+
+// ✅ NUEVA COLUMNA: Estilos para acciones
+.acciones-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    min-width: 80px;
+
+    .btn-accion {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 12px;
+        font-weight: 600;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        i {
+            font-size: 12px;
+        }
+    }
+
+    .btn-detalle {
+        background-color: #17a2b8;
+        color: white;
+
+        &:hover {
+            background-color: #138496;
+        }
+    }
+
+    .btn-pagar-credito {
+        background-color: #28a745;
+        color: white;
+        animation: pulse-green 3s infinite;
+
+        &:hover {
+            background-color: #218838;
+            animation: none;
+        }
+
+        &.btn-vencido {
+            background-color: #dc3545;
+            animation: pulse-red 2s infinite;
+
+            &:hover {
+                background-color: #c82333;
+                animation: none;
+            }
+        }
+    }
+
+    .credito-pagado-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        color: #28a745;
+        font-size: 16px;
+        background-color: rgba(40, 167, 69, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+
+        i {
+            font-size: 14px;
+        }
+    }
+}
+
+// ✅ ESTILOS PARA MODAL DE DETALLE
+:host ::ng-deep .modal-content .detalle-venta {
+    .seccion {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: var(--sidebar-color-fondo);
+        border-radius: 6px;
+        border-left: 3px solid var(--primary-color-neutro);
+
+        h4 {
+            color: var(--color-text);
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+        }
+
+        p {
+            color: var(--color-text);
+            font-size: 12px;
+            margin: 3px 0;
+            line-height: 1.4;
+
+            strong {
+                font-weight: 600;
+            }
+        }
+
+        &.credito-info {
+            border-left-color: #ffc107;
+            background-color: rgba(255, 193, 7, 0.1);
+
+            .vencido {
+                color: #dc3545;
+                font-weight: 700;
+                font-size: 13px;
             }
         }
     }
@@ -608,7 +1377,54 @@ table {
     }
 }
 
-// RESPONSIVE DESIGN
+// ✅ ANIMACIONES PARA CRÉDITOS Y FILTROS
+@keyframes pulse-red {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0);
+    }
+}
+
+@keyframes pulse-orange {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7);
+    }
+    50% {
+        transform: scale(1.01);
+        box-shadow: 0 0 0 3px rgba(255, 152, 0, 0);
+    }
+}
+
+@keyframes pulse-green {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 1000px;
+        transform: translateY(0);
+    }
+}
+
+// RESPONSIVE DESIGN PARA FILTROS Y TABLA
 @media (max-width: 1200px) {
     .productos-column {
         width: 40%;
@@ -618,6 +1434,18 @@ table {
         flex-direction: column;
         gap: 15px;
         align-items: center;
+    }
+
+    .filtros-rapidos-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .filtros-avanzados-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .filtro-grupo.filtro-rango {
+        grid-column: span 1;
     }
 }
 
@@ -652,5 +1480,143 @@ table {
 
     .productos-detalle {
         max-height: 150px;
+    }
+
+    // ✅ RESPONSIVE para créditos y acciones
+    .estado-cell {
+        .estado-credito-pendiente,
+        .estado-credito-pagado {
+            padding: 6px;
+            font-size: 10px;
+
+            small {
+                font-size: 8px;
+            }
+
+            .credito-vencimiento {
+                font-size: 8px;
+            }
+        }
+    }
+
+    .acciones-cell {
+        flex-direction: row;
+        gap: 4px;
+
+        .btn-accion {
+            width: 28px;
+            height: 28px;
+            font-size: 10px;
+
+            i {
+                font-size: 10px;
+            }
+        }
+
+        .credito-pagado-indicator {
+            width: 28px;
+            height: 28px;
+
+            i {
+                font-size: 12px;
+            }
+        }
+    }
+
+    .badge-credito {
+        font-size: 9px;
+        padding: 1px 4px;
+
+        i {
+            font-size: 7px;
+        }
+    }
+
+    // ✅ RESPONSIVE para filtros
+    .filtros-container {
+        padding: 15px;
+    }
+
+    .filtros-rapidos-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+    }
+
+    .btn-filtro-rapido {
+        padding: 10px 6px;
+        min-height: 70px;
+        font-size: 11px;
+
+        i {
+            font-size: 16px;
+        }
+
+        small {
+            font-size: 9px;
+        }
+    }
+
+    .filtros-controles {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtros-info {
+        order: 2;
+    }
+
+    .filtros-acciones {
+        order: 1;
+        justify-content: center;
+    }
+
+    .filtros-avanzados-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .estadisticas-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+
+    .estadistica-card {
+        padding: 8px;
+
+        .estadistica-numero {
+            font-size: 16px;
+        }
+
+        .estadistica-texto {
+            font-size: 10px;
+        }
+    }
+
+    .filtros-activos {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+
+        .texto-filtros-activos {
+            text-align: center;
+        }
+    }
+
+    // Esconder algunos elementos en móvil si es necesario
+    .credito-vencimiento .vigente {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .filtros-rapidos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .btn-filtro-rapido {
+        min-height: 60px;
+        padding: 8px 4px;
+
+        span {
+            font-size: 10px;
+        }
     }
 }

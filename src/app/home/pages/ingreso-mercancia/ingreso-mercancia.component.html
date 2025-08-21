@@ -1,60 +1,226 @@
 <div class="container">
 
     <div class="products-header">
-
-
-
         <div class="products-header_pruduct">
             <span><i class="fa-solid fa-right-left icon"></i></span>
-            <p>Ingreso de mercancia</p>
-            <p>Gestion de ingreso de mercancía PRODUCTOS EXISTENTES</p>
+            <p>Ingreso de mercancía</p>
+            <p>Gestión de ingreso de mercancía para productos existentes</p>
         </div>
-
     </div>
 
     <div>
         <div class="product-movements">
             <app-button-click label="Ingresar mercancía" [buttonMethod]="doSomething"></app-button-click>
 
+            <div class="input-content">
+                <label class="label" for="busqueda">Buscar:</label>
+                <input class="input" id="busqueda" [(ngModel)]="search" placeholder="Buscar por código de producto o ingreso">
+            </div>
+
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>producto_id</th>
-                            <th>código de producto</th>
-                            <th>fecha</th>
-                            <th>cantidad_de_ingreso</th>
-                            <th>created_at</th>
-                            <th>updated_at</th>
+                            <th>Fecha</th>
+                            <th>Producto / Variante</th>
+                            <th>Tipo de Ingreso</th>
+                            <th>Cantidad</th>
+                            <th>Stock</th>
+                            <th>Código Ingreso</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody *ngFor="let data of (data.data | searchSale:'codigo': search  | paginate: { itemsPerPage: 5, currentPage: p })">
-                        <tr>
-                            <td>{{data.producto_id}}</td>
-                            <td>{{data.codigo}}</td>
-                            <td>{{data.fecha}}</td>
-                            <td>{{data.cantidad_de_ingreso}}</td>
-                            <td>{{data.created_at}}</td>
-                            <td>{{data.updated_at}}</td>
+                    <tbody>
+                        <tr *ngFor="let ingreso of (data.data | searchSale:'codigo': search | paginate: { itemsPerPage: 5, currentPage: p })"
+                            [class.ingreso-variante]="esIngresoVariante(ingreso)"
+                            [class.ingreso-producto]="esIngresoProductoBase(ingreso)">
+                            
+                            <!-- FECHA -->
+                            <td>
+                                <div class="fecha-cell">
+                                    <span class="date">
+                                        <i class="fa-solid fa-calendar"></i>
+                                    </span>
+                                    <div class="fecha-info">
+                                        <div class="fecha-principal">{{formatearFecha(ingreso.fecha)}}</div>
+                                        <div class="fecha-creacion">{{formatearFecha(ingreso.created_at)}}</div>
+                                    </div>
+                                </div>
+                            </td>
 
+                            <!-- PRODUCTO / VARIANTE -->
+                            <td class="producto-column">
+                                <div class="producto-container">
+                                    <!-- Información principal del producto -->
+                                    <div class="producto-header">
+                                        <div class="producto-nombre">
+                                            <i class="fa-solid fa-box" *ngIf="esIngresoProductoBase(ingreso)"></i>
+                                            <i class="fa-solid fa-tags" *ngIf="esIngresoVariante(ingreso)"></i>
+                                            {{getNombreCompleto(ingreso)}}
+                                        </div>
+                                        <div class="producto-codigo">{{getCodigoItem(ingreso)}}</div>
+                                    </div>
+
+                                    <!-- Información de variante (si existe) -->
+                                    <div *ngIf="esIngresoVariante(ingreso)" class="variante-info">
+                                        <div class="variante-detalles">
+                                            <span class="sku-badge" *ngIf="ingreso.producto_variante?.sku">
+                                                {{ingreso.producto_variante.sku}}
+                                            </span>
+                                            
+                                            <span class="color-info" *ngIf="ingreso.producto_variante?.color">
+                                                <div class="color-dot" 
+                                                     [style.background-color]="ingreso.producto_variante.color.codigo_hex">
+                                                </div>
+                                                {{ingreso.producto_variante.color.nombre}}
+                                            </span>
+                                            
+                                            <span class="size-info" *ngIf="ingreso.producto_variante?.talla">
+                                                <i class="fa-solid fa-ruler"></i>
+                                                {{ingreso.producto_variante.talla.nombre}}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Badge de tipo -->
+                                    <div class="tipo-badge-container">
+                                        <span class="badge-tipo" 
+                                              [class.badge-producto]="esIngresoProductoBase(ingreso)"
+                                              [class.badge-variante]="esIngresoVariante(ingreso)">
+                                            {{getTipoIngreso(ingreso)}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- TIPO DE INGRESO -->
+                            <td>
+                                <div class="tipo-cell">
+                                    <div *ngIf="esIngresoProductoBase(ingreso)" class="tipo-producto">
+                                        <i class="fa-solid fa-cube"></i>
+                                        <span>Producto Base</span>
+                                        <small>Stock general</small>
+                                    </div>
+                                    <div *ngIf="esIngresoVariante(ingreso)" class="tipo-variante">
+                                        <i class="fa-solid fa-layer-group"></i>
+                                        <span>Variante Específica</span>
+                                        <small>Stock por variante</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- CANTIDAD -->
+                            <td>
+                                <div class="cantidad-cell">
+                                    <div class="cantidad-principal">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span class="cantidad-numero">{{ingreso.cantidad_de_ingreso}}</span>
+                                        <span class="unidades">unidades</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- STOCK -->
+                            <td>
+                                <div class="stock-cell">
+                                    <div class="stock-item">
+                                        <label>Anterior:</label>
+                                        <span class="stock-anterior">{{getStockAnterior(ingreso)}}</span>
+                                    </div>
+                                    
+                                    <div class="stock-operacion">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                        <span class="operacion">+{{ingreso.cantidad_de_ingreso}}</span>
+                                    </div>
+                                    
+                                    <div class="stock-item">
+                                        <label>Actual:</label>
+                                        <span class="stock-actual" 
+                                              [class.stock-alto]="getStockActual(ingreso) > 50"
+                                              [class.stock-medio]="getStockActual(ingreso) > 10 && getStockActual(ingreso) <= 50"
+                                              [class.stock-bajo]="getStockActual(ingreso) <= 10">
+                                            {{getStockActual(ingreso)}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- CÓDIGO INGRESO -->
+                            <td>
+                                <div class="codigo-cell">
+                                    <div class="codigo-ingreso">
+                                        <i class="fa-solid fa-hashtag"></i>
+                                        <span class="codigo-numero">{{ingreso.codigo}}</span>
+                                    </div>
+                                    <div class="fecha-registro">
+                                        {{formatearFecha(ingreso.created_at)}}
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- ACCIONES -->
+                            <td>
+                                <div class="acciones-cell">
+                                    <!-- Botón ver detalle -->
+                                    <button 
+                                        type="button"
+                                        class="btn-accion btn-detalle"
+                                        (click)="verDetalleIngreso(ingreso)"
+                                        title="Ver información detallada">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+
+                <!-- MENSAJE SI NO HAY INGRESOS -->
+                <div *ngIf="!hayIngresos()" class="sin-ingresos">
+                    <div class="sin-ingresos-content">
+                        <i class="fa-solid fa-box-open"></i>
+                        <h3>No hay ingresos registrados</h3>
+                        <p>Comienza agregando tu primer ingreso de mercancía</p>
+                        <button class="btn-primer-ingreso" (click)="doSomething()">
+                            <i class="fa-solid fa-plus"></i>
+                            Agregar primer ingreso
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <pagination-controls
-            class="my-pagination"
-            [directionLinks]="false"
-            (pageChange)="p = $event"
-            previousLabel="Anterior"
-            nextLabel="Siguiente"
-            [maxSize]="5"
-            [responsive]="true"
-            ></pagination-controls>
+            <!-- ESTADÍSTICAS DE INGRESOS -->
+            <div class="ingresos-estadisticas" *ngIf="hayIngresos()">
+                <div class="estadistica-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Total ingresos: {{getTotalIngresos()}}</span>
+                </div>
+                <div class="estadistica-item">
+                    <i class="fa-solid fa-tags"></i>
+                    <span>Con variantes: {{getTotalIngresosVariantes()}}</span>
+                </div>
+                <div class="estadistica-item">
+                    <i class="fa-solid fa-boxes"></i>
+                    <span>Unidades ingresadas: {{getTotalUnidadesIngresadas()}}</span>
+                </div>
+                <div class="estadistica-item">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <span>Ingresos hoy: {{getIngresosHoy()}}</span>
+                </div>
+            </div>
 
+            <!-- PAGINACIÓN -->
+            <pagination-controls 
+                class="my-pagination"
+                [directionLinks]="false"
+                (pageChange)="p = $event" 
+                previousLabel="Anterior"
+                nextLabel="Siguiente"  
+                [maxSize]="5" 
+                [responsive]="true">
+            </pagination-controls>
 
         </div>
-
     </div>
 
 </div>

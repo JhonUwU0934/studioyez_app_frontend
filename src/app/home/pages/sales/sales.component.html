@@ -26,12 +26,18 @@
                             <th>Total</th>
                             <th>Productos</th>
                             <th>Vendedor</th>
-                            <th>Estado</th>
+                            <th>Estado / Crédito</th>
                             <th>Factura</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody *ngFor="let data of (data.data | searchSale:'codigo_factura': search | paginate: { itemsPerPage: 5, currentPage: p })">
-                        <tr>
+                    <tbody>
+                        <tr *ngFor="let data of (data.data | searchSale:'codigo_factura': search | paginate: { itemsPerPage: 5, currentPage: p })"
+                            [class.credito-pendiente]="creditoPendiente(data)"
+                            [class.credito-vencido]="creditoVencido(data)"
+                            [class.credito-pagado]="creditoPagado(data)"
+                            [class.credito-por-vencer]="creditoPendiente(data) && getDiasRestantesCredito(data) <= 3 && !creditoVencido(data)">
+                            
                             <!-- FECHA -->
                             <td>
                                 <div class="fecha-cell">
@@ -63,6 +69,14 @@
                                     </div>
                                     <div class="badge-variantes" *ngIf="esVentaConVariantes(data)">
                                         <i class="fa-solid fa-tags"></i> Con variantes
+                                    </div>
+                                    <!-- Badge de crédito -->
+                                    <div *ngIf="tieneCredito(data)" class="badge-credito" 
+                                         [class.credito-pendiente-badge]="creditoPendiente(data)"
+                                         [class.credito-pagado-badge]="creditoPagado(data)"
+                                         [class.credito-vencido-badge]="creditoVencido(data)">
+                                        <i class="fa-solid fa-credit-card"></i> 
+                                        ${{parseFloat(data.valor_credito || '0') | customNumber}}
                                     </div>
                                 </div>
                             </td>
@@ -104,7 +118,6 @@
                                                 <div class="cantidad-precio">
                                                     <span class="cantidad">Cant: {{item.pivot.cantidad}}</span>
                                                     <span class="precio-unitario">
-                                                        <!-- ✅ CORREGIDO: Usar método del componente en lugar de función directa -->
                                                         ${{getPrecioUnitarioFormateado(item) | customNumber}}
                                                     </span>
                                                 </div>
@@ -113,7 +126,6 @@
                                                     <span class="total-producto">
                                                         Total: ${{item.pivot.total_producto | customNumber}}
                                                     </span>
-                                                    <!-- ✅ CORREGIDO: Usar método del componente -->
                                                     <span *ngIf="tieneDescuento(item.pivot.descuento)" class="descuento">
                                                         Desc: ${{item.pivot.descuento | customNumber}}
                                                     </span>
@@ -140,16 +152,58 @@
                                 </div>
                             </td>
 
-                            <!-- ESTADO -->
+                            <!-- ESTADO / CRÉDITO -->
                             <td>
                                 <div class="estado-cell">
-                                    <div *ngIf="data.estado_pago === '1'" class="estado-activo">
+                                    <!-- Estado de pago tradicional -->
+                                    <div *ngIf="data.estado_pago === '1' && !tieneCredito(data)" class="estado-activo">
                                         <i class="fa-solid fa-check-circle"></i>
                                         Pagada
                                     </div>
-                                    <div *ngIf="!data.estado_pago || data.estado_pago !== '1'" class="estado-pendiente">
+                                    <div *ngIf="(!data.estado_pago || data.estado_pago !== '1') && !tieneCredito(data)" class="estado-pendiente">
                                         <i class="fa-solid fa-clock"></i>
                                         Pendiente
+                                    </div>
+
+                                    <!-- Estados de crédito -->
+                                    <div *ngIf="creditoPagado(data)" class="estado-credito-pagado">
+                                        <i class="fa-solid fa-check-double"></i>
+                                        <span>Crédito Pagado</span>
+                                        <small>${{parseFloat(data.valor_credito || '0') | customNumber}}</small>
+                                    </div>
+
+                                    <div *ngIf="creditoPendiente(data)" class="estado-credito-pendiente">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                        <span>Crédito Pendiente</span>
+                                        <small>${{parseFloat(data.valor_credito || '0') | customNumber}}</small>
+                                        
+                                        <!-- Información de vencimiento -->
+                                        <div class="credito-vencimiento">
+                                            <div *ngIf="creditoVencido(data)" class="vencido">
+                                                <i class="fa-solid fa-exclamation-triangle"></i>
+                                                ¡VENCIDO!
+                                            </div>
+                                            <div *ngIf="!creditoVencido(data) && getDiasRestantesCredito(data) <= 3" class="por-vencer">
+                                                <i class="fa-solid fa-clock"></i>
+                                                Vence en {{getDiasRestantesCredito(data)}} día(s)
+                                            </div>
+                                            <div *ngIf="!creditoVencido(data) && getDiasRestantesCredito(data) > 3" class="vigente">
+                                                <i class="fa-solid fa-calendar-check"></i>
+                                                {{getDiasRestantesCredito(data)}} días restantes
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Estado mixto (pago parcial + crédito) -->
+                                    <div *ngIf="tienePagoMixto(data)" class="estado-mixto">
+                                        <div class="pago-info">
+                                            <span *ngIf="tieneValorEfectivo(data)" class="efectivo-badge">
+                                                Efec: ${{parseFloat(data.valor_efectivo || '0') | customNumber}}
+                                            </span>
+                                            <span *ngIf="tieneValorTransferencia(data)" class="transferencia-badge">
+                                                Trans: ${{parseFloat(data.valor_transferencia || '0') | customNumber}}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -177,6 +231,39 @@
                                     </ng-template>
                                 </div>
                             </td>
+
+                            <!-- ACCIONES -->
+                            <td>
+                                <div class="acciones-cell">
+                                    <!-- Botón ver detalle -->
+                                    <button 
+                                        type="button"
+                                        class="btn-accion btn-detalle"
+                                        (click)="verDetalleVenta(data)"
+                                        title="Ver información detallada">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+
+                                    <!-- Botón pagar crédito (solo si tiene crédito pendiente) -->
+                                    <button 
+                                        *ngIf="creditoPendiente(data)"
+                                        type="button"
+                                        class="btn-accion btn-pagar-credito"
+                                        [class.btn-vencido]="creditoVencido(data)"
+                                        (click)="pagarCredito(data)"
+                                        [title]="'Marcar crédito como pagado ($' + (parseFloat(data.valor_credito || '0') | customNumber) + ')'">
+                                        <i class="fa-solid fa-dollar-sign"></i>
+                                    </button>
+
+                                    <!-- Indicador de crédito pagado -->
+                                    <span 
+                                        *ngIf="creditoPagado(data)"
+                                        class="credito-pagado-indicator"
+                                        title="Crédito ya pagado">
+                                        <i class="fa-solid fa-check-circle"></i>
+                                    </span>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -190,13 +277,20 @@
                 </div>
                 <div class="estadistica-item">
                     <i class="fa-solid fa-tags"></i>
-                    <!-- ✅ CORREGIDO: Usar método del componente -->
                     <span>Con variantes: {{contarVentasConVariantes()}}</span>
                 </div>
                 <div class="estadistica-item">
                     <i class="fa-solid fa-dollar-sign"></i>
-                    <!-- ✅ CORREGIDO: Usar método del componente -->
                     <span>Total vendido: ${{calcularTotalVendido() | customNumber}}</span>
+                </div>
+                <!-- Estadística de créditos -->
+                <div class="estadistica-item" *ngIf="tieneAlgunaVentaConCredito()">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Con crédito: {{contarVentasConCredito()}}</span>
+                </div>
+                <div class="estadistica-item" *ngIf="tieneAlgunaVentaConCreditoPendiente()">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                    <span>Créditos pendientes: {{contarVentasConCreditoPendiente()}}</span>
                 </div>
             </div>
 

@@ -1,9 +1,5 @@
 @import '../../../../styles.scss';
 
-// background-color: #fff;
-// background-color: var(--sidebar-color-fondo);
-// color: var(--color-text);
-
 .modal {
     position: fixed;
     top: 0;
@@ -13,31 +9,27 @@
     background-color: rgba(0, 0, 0, 0.2);
     z-index: 101;
     padding: 10px 0;
-
+    overflow-y: auto; /* ✅ NUEVO: Permitir scroll en el modal */
 
     .modal-content {
-        margin: 40vh auto;
-        max-width: 300px;
+        margin: 5vh auto; /* ✅ MODIFICADO: Reducir margen para modales grandes */
+        max-width: 400px; /* ✅ MODIFICADO: Aumentar ancho máximo */
+        max-height: 90vh; /* ✅ NUEVO: Limitar altura máxima */
         background-color: #fff;
-        // background-color: var(--sidebar-color-fondo);
-        // color: var(--color-text);
         padding: 20px;
-
         border-radius: 10px;
         box-shadow: 6.7px 6.7px 5.3px rgba(0, 0, 0, 0.02),
             22.3px 22.3px 17.9px rgba(0, 0, 0, 0.03),
             100px 100px 80px rgba(0, 0, 0, 0.05);
-            // animation: flash .5s ease;
-            animation: pulse .3s  ease;
-
-            
-            
-            // animation: slide-top 0.6s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-            // animation-fill-mode: forwards;
-            // animation-duration: 0.5s;
+        animation: pulse .3s ease;
+        overflow-y: auto; /* ✅ NUEVO: Scroll interno si es necesario */
 
         .modal-header {
             border-bottom: solid 1px #bbb8b8;
+            position: sticky; /* ✅ NUEVO: Header fijo */
+            top: 0;
+            background-color: #fff;
+            z-index: 1;
         }
 
         .contenedor {
@@ -50,13 +42,13 @@
             span {
                 svg {
                     font-size: 24px;
-                    // color: rgb(241, 40, 40);
                 }
             }
         }
 
         .tit {
-            font-size: 20px;
+            font-size: 18px; /* ✅ MODIFICADO: Reducir tamaño para títulos largos */
+            line-height: 1.2;
         }
 
         #close-modal {
@@ -69,26 +61,35 @@
         img {
             width: 30px;
         }
-
-        ;
     }
 }
 
 .modal-body {
     margin-top: 5px;
+    max-height: 60vh; /* ✅ NUEVO: Limitar altura del contenido */
+    overflow-y: auto; /* ✅ NUEVO: Scroll para contenido largo */
 
     #messa {
-        font-size: 15px;
+        font-size: 13px; /* ✅ MODIFICADO: Reducir tamaño de fuente */
         margin: 15px 0;
         text-align: left;
-        line-height: 18px;
+        line-height: 1.4; /* ✅ MODIFICADO: Mejorar espaciado */
+        font-family: 'Courier New', monospace; /* ✅ NUEVO: Fuente monoespaciada para mejor alineación */
+        white-space: pre-line; /* ✅ NUEVO: Respetar saltos de línea */
+        word-wrap: break-word; /* ✅ NUEVO: Romper palabras largas */
     }
 }
 
-.modal-boton-container{
+.modal-boton-container {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    position: sticky; /* ✅ NUEVO: Botones fijos */
+    bottom: 0;
+    background-color: #fff;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
 }
 
 .modal-boton {
@@ -98,7 +99,7 @@
 
 .css-button-shadow-border--red {
     color: #fff;
-    padding: 5px 10px;
+    padding: 8px 16px; /* ✅ MODIFICADO: Aumentar padding */
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -107,20 +108,58 @@
     outline: none;
     border-radius: 5px;
     border: none;
-    box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5), 7px 7px 20px 0px rgba(0,0,0,.1), 4px 4px 5px 0px rgba(0,0,0,.1);
+    box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.5), 7px 7px 20px 0px rgba(0,0,0,.1), 4px 4px 5px 0px rgba(0,0,0,.1);
     background: var(--primary-color-neutro);
+    font-size: 12px; /* ✅ NUEVO: Tamaño de fuente consistente */
 }
-  .css-button-shadow-border--red:hover {
+
+.css-button-shadow-border--red:hover {
     background-color: var(--primary-color-neutro);
-  }
-  .css-button-shadow-border--red:active {
+    filter: brightness(0.9);
+}
+
+.css-button-shadow-border--red:active {
     top: 2px;
-  }
+}
 
-  .loader {
+.loader {
     text-align: center;
-  }
+    margin: 20px 0;
+}
 
+/* ✅ NUEVOS: Colores adicionales para iconos */
+.red {
+    color: rgb(241, 40, 40);
+}
+
+.green {
+    color: #70cf70;
+}
+
+.blue {
+    color: #2196f3;
+}
+
+/* ✅ NUEVO: Responsive design */
+@media (max-width: 768px) {
+    .modal {
+        padding: 5px;
+        
+        .modal-content {
+            max-width: 95vw;
+            margin: 2vh auto;
+            padding: 15px;
+            
+            .tit {
+                font-size: 16px;
+            }
+        }
+        
+        .modal-body #messa {
+            font-size: 12px;
+        }
+    }
+}
 
 @keyframes slide-top {
     0% {
@@ -142,26 +181,18 @@
 
 .flash {
     animation: flash 500ms ease infinite alternate;
-  }
-  @keyframes flash {
-      from { opacity: 0; }	
-      to { opacity: 1; }
-  }
-
-  .pulse {
-    animation: pulse 1s  ease-in-out alternate;
-     
-  }
-  @keyframes pulse {
-    from { transform: scale(.98); -webkit-transform: scale(.98); -moz-transform: scale(.98); -ms-transform: scale(.98); -o-transform: scale(.98); }
-    to { transform: scale(1.03); -webkit-transform: scale(1.03); -moz-transform: scale(1.03); -ms-transform: scale(1.03); -o-transform: scale(1.03); }
-  }
-
-
-.red{
-    color: rgb(241, 40, 40);
 }
 
-.green{
-    color: #70cf70;
+@keyframes flash {
+    from { opacity: 0; }	
+    to { opacity: 1; }
+}
+
+.pulse {
+    animation: pulse 1s ease-in-out alternate;
+}
+
+@keyframes pulse {
+    from { transform: scale(.98); -webkit-transform: scale(.98); -moz-transform: scale(.98); -ms-transform: scale(.98); -o-transform: scale(.98); }
+    to { transform: scale(1.03); -webkit-transform: scale(1.03); -moz-transform: scale(1.03); -ms-transform: scale(1.03); -o-transform: scale(1.03); }
 }
