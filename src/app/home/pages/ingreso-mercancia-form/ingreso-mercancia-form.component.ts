@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject, ChangeDetectionStrategy, ChangeDe
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription, Subject, BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, startWith, map, shareReplay, catchError, filter, take } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, startWith, map, shareReplay, catchError } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { inputModel } from 'src/app/shared/models/input.model';
 import { ApiGetService } from 'src/app/shared/services/api-get.service';
@@ -142,30 +142,23 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
   }
 
   private setupStreams(): void {
-    // Stream de productos: debounce 300ms -> obtener token fresco -> búsqueda server-side
+    // Stream de productos: debounce 300ms -> búsqueda server-side via index() con ?q=
     this.productosFiltrados$ = this.filtroProductoSubject$.pipe(
       startWith(''),
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(filtro => {
-        if (filtro.trim().length < 2) {
+        if (filtro.trim().length < 2 || !this.token) {
           return of([] as Producto[]);
         }
-        // Obtener token fresco del auth service para evitar race condition
-        return this.auth.getUsuario.pipe(
-          filter((u: any) => !!u?.token),
-          take(1),
-          switchMap((usuario: any) => {
-            const url = `${this.baseUrl}/api/v1/productos/search?q=${encodeURIComponent(filtro)}&limit=20`;
-            const headers = { 'Authorization': 'Bearer ' + usuario.token };
-            return this.apiGet.getDebtInfo(url, headers).pipe(
-              map((resp: any) => (resp.data || []).map((p: any) => ({
-                ...p,
-                tiene_variantes: (p.variantes_count || 0) > 0
-              }))),
-              catchError(() => of([] as Producto[]))
-            );
-          })
+        const url = `${this.baseUrl}/api/v1/productos?q=${encodeURIComponent(filtro)}&limit=20`;
+        const headers = { 'Authorization': this.token };
+        return this.apiGet.getDebtInfo(url, headers).pipe(
+          map((resp: any) => (resp.data || []).map((p: any) => ({
+            ...p,
+            tiene_variantes: (p.variantes_count || 0) > 0
+          }))),
+          catchError(() => of([] as Producto[]))
         );
       }),
       shareReplay(1)
