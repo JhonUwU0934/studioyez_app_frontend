@@ -126,9 +126,9 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeComponent();
+    this.loadInitialData();
     this.setupStreams();
     this.setupDynamicValidations();
-    this.loadInitialData();
   }
 
   private initializeComponent(): void {
