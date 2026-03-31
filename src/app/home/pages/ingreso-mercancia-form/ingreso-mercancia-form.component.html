@@ -20,7 +20,7 @@
   </div>
 
   <!-- Contenido del formulario -->
-  <div class="form-content" *ngIf="!isLoading" (click)="closeDropdowns()">
+  <div class="form-content" *ngIf="!enviandoLote" (click)="closeDropdowns()">
     <form [formGroup]="productForm" (ngSubmit)="getSubmit()" class="product-form">
       
       <!-- Selección de Producto -->

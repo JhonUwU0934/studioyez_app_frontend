@@ -512,7 +512,7 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
     // Limpiar selección para agregar otro, mantener fecha
     const fecha = this.productForm.get('fecha')?.value;
     this.resetFormulario();
-    this.productForm.patchValue({ fecha });
+    this.productForm.patchValue({ fecha, cantidad: '' });
     this.cdr.markForCheck();
   }
 
