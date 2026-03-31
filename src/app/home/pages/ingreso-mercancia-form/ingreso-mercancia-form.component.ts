@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription, Subject, BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, startWith, map, shareReplay, catchError } from 'rxjs/operators';
+import { Subscription, Subject, BehaviorSubject, Observable, combineLatest, of, from } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, startWith, map, shareReplay, catchError, concatMap, tap, finalize } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { inputModel } from 'src/app/shared/models/input.model';
 import { ApiGetService } from 'src/app/shared/services/api-get.service';
@@ -41,6 +41,16 @@ interface Producto {
   existente_en_almacen: number;
   variantes_count?: number;
   tiene_variantes?: boolean;
+}
+
+interface ItemLote {
+  id: number;
+  producto: Producto;
+  variante: ProductoVariante | null;
+  tipoIngreso: 'producto' | 'variante';
+  cantidad: number;
+  nombreDisplay: string;
+  codigoDisplay: string;
 }
 
 @Component({
@@ -90,6 +100,13 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
   cargandoVariantes = false;
   isLoading = false;
   tipoIngreso: 'producto' | 'variante' = 'producto';
+
+  // Lote de ingresos
+  itemsLote: ItemLote[] = [];
+  private nextItemId = 1;
+  enviandoLote = false;
+  progresoLote = 0;
+  totalLote = 0;
 
   // Estados de UI
   filtroProducto = '';
@@ -466,107 +483,117 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
            (this.tipoIngreso === 'variante' && !!this.varianteSeleccionada);
   }
 
-  getSubmit(): void {
-    console.log('=== INICIO SUBMIT ===');
-    console.log('Tipo ingreso:', this.tipoIngreso);
-    console.log('Producto seleccionado:', this.productoSeleccionado);
-    console.log('Variante seleccionada:', this.varianteSeleccionada);
-    console.log('Formulario valores:', this.productForm.value);
-    console.log('Formulario válido:', this.productForm.valid);
-    console.log('Tiene selección válida:', this.tieneSeleccionValida());
+  // === LOTE ===
 
-    // Validación mejorada antes del envío
+  agregarAlLote(): void {
     if (!this.tieneSeleccionValida()) {
       this.modalService.showError('Debe seleccionar un producto o una variante');
       return;
     }
 
-    if (this.productForm.invalid) {
-      this.markFormGroupTouched(this.productForm);
-      this.modalService.showError('Por favor completa todos los campos requeridos');
+    const cantidad = parseInt(this.productForm.get('cantidad')?.value);
+    if (!cantidad || cantidad <= 0) {
+      this.modalService.showError('La cantidad debe ser mayor a 0');
       return;
     }
 
-    // Preparar datos con validación adicional
-    const formData = this.productForm.getRawValue();
-    
-    const paramsBody: any = {
-      fecha: formData.fecha,
-      cantidad_de_ingreso: parseInt(formData.cantidad)
+    const item: ItemLote = {
+      id: this.nextItemId++,
+      producto: this.productoSeleccionado!,
+      variante: this.tipoIngreso === 'variante' ? this.varianteSeleccionada : null,
+      tipoIngreso: this.tipoIngreso,
+      cantidad,
+      nombreDisplay: this.getNombreCompleto(),
+      codigoDisplay: this.getSkuMostrar(),
     };
 
-    // Solo agregar los campos que realmente necesitamos
-    if (this.tipoIngreso === 'producto' && this.productoSeleccionado) {
-      paramsBody.producto_id = this.productoSeleccionado.id;
-      // NO incluir producto_variante_id
-    } else if (this.tipoIngreso === 'variante' && this.varianteSeleccionada) {
-      paramsBody.producto_variante_id = this.varianteSeleccionada.id;
-      // NO incluir producto_id - el backend lo asignará automáticamente
-    } else {
-      this.modalService.showError('Error: No se pudo determinar el producto o variante a ingresar');
+    this.itemsLote.push(item);
+
+    // Limpiar selección para agregar otro, mantener fecha
+    const fecha = this.productForm.get('fecha')?.value;
+    this.resetFormulario();
+    this.productForm.patchValue({ fecha });
+    this.cdr.markForCheck();
+  }
+
+  eliminarDelLote(itemId: number): void {
+    this.itemsLote = this.itemsLote.filter(i => i.id !== itemId);
+    this.cdr.markForCheck();
+  }
+
+  getTotalCantidadLote(): number {
+    return this.itemsLote.reduce((sum, item) => sum + item.cantidad, 0);
+  }
+
+  trackByItemId = (index: number, item: ItemLote): number => item.id;
+
+  getSubmit(): void {
+    if (this.itemsLote.length === 0) {
+      this.modalService.showError('Agrega al menos un producto al lote');
       return;
     }
 
-    console.log('Datos a enviar:', paramsBody);
-
-    // Validar cantidad
-    if (isNaN(paramsBody.cantidad_de_ingreso) || paramsBody.cantidad_de_ingreso <= 0) {
-      this.modalService.showError('La cantidad debe ser un número mayor a 0');
+    const fecha = this.productForm.get('fecha')?.value;
+    if (!fecha) {
+      this.modalService.showError('Selecciona una fecha');
       return;
     }
 
+    this.enviandoLote = true;
+    this.progresoLote = 0;
+    this.totalLote = this.itemsLote.length;
     this.isLoading = true;
     this.buttonService.setCHange(true);
     this.cdr.markForCheck();
 
     const headers = { Authorization: this.token };
     const UrlApi = `${this.baseUrl}/api/v1/ingresodemercancia`;
+    let exitosos = 0;
+    let fallidos: string[] = [];
 
     this.subscriptions$.add(
-      this.apiPost.getDebtInfo(UrlApi, paramsBody, headers).subscribe({
-        next: (resp) => {
-          console.log('Respuesta exitosa:', resp);
-          this.isLoading = false;
-          this.buttonService.setCHange(false);
-          this.cdr.markForCheck();
-          
-          this.modalService.showSuccess('Ingreso de mercancía registrado exitosamente');
-          
-          setTimeout(() => {
-            this.router.navigate(['/home/ingreso-mercancia']);
-          }, 1500);
-        },
-        error: (error) => {
-          console.error('Error completo:', error);
-          console.error('Error response:', error.error);
-          console.error('Error status:', error.status);
-          console.error('Error statusText:', error.statusText);
-          
-          // Log detallado de errores de validación
-          if (error.error && error.error.errors) {
-            console.error('Errores de validación específicos:', error.error.errors);
-            Object.keys(error.error.errors).forEach(key => {
-              console.error(`Campo ${key}:`, error.error.errors[key]);
-            });
-          }
-          
-          this.isLoading = false;
-          this.buttonService.setCHange(false);
-          this.cdr.markForCheck();
-          
-          if (error.error && error.error.errors) {
-            // Mostrar todos los errores de validación
-            const allErrors = Object.entries(error.error.errors)
-              .map(([field, messages]: [string, any]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
-              .join('\n');
-            this.modalService.showError(`Errores de validación:\n${allErrors}`);
-          } else if (error.error && error.error.error) {
-            this.modalService.showError(error.error.error);
+      from(this.itemsLote).pipe(
+        concatMap(item => {
+          const body: any = {
+            fecha,
+            cantidad_de_ingreso: item.cantidad
+          };
+          if (item.tipoIngreso === 'variante' && item.variante) {
+            body.producto_variante_id = item.variante.id;
           } else {
-            this.modalService.showError('Error al registrar el ingreso de mercancía');
+            body.producto_id = item.producto.id;
           }
-        }
-      })
+          return this.apiPost.getDebtInfo(UrlApi, body, headers).pipe(
+            tap(() => {
+              exitosos++;
+              this.progresoLote++;
+              this.cdr.markForCheck();
+            }),
+            catchError(err => {
+              this.progresoLote++;
+              fallidos.push(item.nombreDisplay);
+              this.cdr.markForCheck();
+              return of(null);
+            })
+          );
+        }),
+        finalize(() => {
+          this.enviandoLote = false;
+          this.isLoading = false;
+          this.buttonService.setCHange(false);
+          this.cdr.markForCheck();
+
+          if (fallidos.length === 0) {
+            this.modalService.showSuccess(`Se registraron ${exitosos} ingresos exitosamente`);
+            setTimeout(() => this.router.navigate(['/home/ingreso-mercancia']), 1500);
+          } else {
+            this.modalService.showError(
+              `${exitosos} registrados, ${fallidos.length} fallaron: ${fallidos.join(', ')}`
+            );
+          }
+          this.itemsLote = [];
+        })
+      ).subscribe()
     );
   }
 
