@@ -1,0 +1,90 @@
+<div class="cierres-container">
+
+  <div class="cierres-header">
+    <h2><i class="fas fa-chart-bar"></i> Cierres Diarios</h2>
+  </div>
+
+  <!-- Selector de periodo -->
+  <div class="tabs">
+    <button class="tab" [class.active]="periodo === 'dia'" (click)="cambiarPeriodo('dia')">
+      <i class="fas fa-calendar-day"></i> Por Dia
+    </button>
+    <button class="tab" [class.active]="periodo === 'semana'" (click)="cambiarPeriodo('semana')">
+      <i class="fas fa-calendar-week"></i> Por Semana
+    </button>
+    <button class="tab" [class.active]="periodo === 'mes'" (click)="cambiarPeriodo('mes')">
+      <i class="fas fa-calendar-alt"></i> Por Mes
+    </button>
+  </div>
+
+  <!-- Resumen totales -->
+  <div class="totales-grid" *ngIf="cierres.length > 0 && !cargando">
+    <div class="total-card">
+      <div class="total-label">Ventas totales</div>
+      <div class="total-value ventas">{{ formatMoney(totalVentas) }}</div>
+    </div>
+    <div class="total-card">
+      <div class="total-label">Efectivo</div>
+      <div class="total-value efectivo">{{ formatMoney(totalEfectivo) }}</div>
+    </div>
+    <div class="total-card">
+      <div class="total-label">Transferencias</div>
+      <div class="total-value transferencia">{{ formatMoney(totalTransferencia) }}</div>
+    </div>
+    <div class="total-card">
+      <div class="total-label">Gastos</div>
+      <div class="total-value gastos">{{ formatMoney(totalGastos) }}</div>
+    </div>
+    <div class="total-card">
+      <div class="total-label">Balance</div>
+      <div class="total-value balance" [class.negativo]="totalBalance < 0">{{ formatMoney(totalBalance) }}</div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="cargando">
+    <i class="fas fa-spinner fa-spin"></i> Cargando cierres...
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-responsive" *ngIf="!cargando">
+    <table>
+      <thead>
+        <tr>
+          <th>Periodo</th>
+          <th style="text-align: center;"># Ventas</th>
+          <th style="text-align: right;">Ventas</th>
+          <th style="text-align: right;">Efectivo</th>
+          <th style="text-align: right;">Transferencia</th>
+          <th style="text-align: right;">Gastos</th>
+          <th style="text-align: right;">Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of (cierres | paginate: { itemsPerPage: 20, currentPage: p })">
+          <td class="fecha">{{ formatRango(c) }}</td>
+          <td style="text-align: center;">{{ c.cantidad_ventas }}</td>
+          <td style="text-align: right; font-weight: 600;">{{ formatMoney(c.total_ventas) }}</td>
+          <td style="text-align: right; color: #4CAF50;">{{ formatMoney(c.total_efectivo) }}</td>
+          <td style="text-align: right; color: #2196F3;">{{ formatMoney(c.total_transferencia) }}</td>
+          <td style="text-align: right; color: #f44336;">{{ formatMoney(c.total_gastos) }}</td>
+          <td style="text-align: right; font-weight: 700;" [style.color]="c.balance >= 0 ? '#4CAF50' : '#f44336'">
+            {{ formatMoney(c.balance) }}
+          </td>
+        </tr>
+        <tr *ngIf="cierres.length === 0">
+          <td colspan="7" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No hay cierres para este periodo</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-wrapper" *ngIf="cierres.length > 20">
+    <pagination-controls (pageChange)="p = $event" previousLabel="Anterior" nextLabel="Siguiente">
+    </pagination-controls>
+  </div>
+
+</div>

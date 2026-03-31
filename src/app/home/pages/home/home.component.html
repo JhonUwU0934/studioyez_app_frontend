@@ -30,8 +30,18 @@
             <table>
                 <tbody>
                     <tr>
-                        <td><span style="color: rgb(181, 215, 124);"><i class="fa-solid fa-coins"></i></span> <span>Ventas</span></td>
-                        <td>{{sales | customNumber}}</td>     
+                        <td><span style="color: rgb(181, 215, 124);"><i class="fa-solid fa-coins"></i></span> <span>Ventas totales</span></td>
+                        <td>{{sales | customNumber}}</td>
+                        <td><i class="fa-regular fa-circle-dot"></i></td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: #4CAF50;"><i class="fa-solid fa-money-bill-wave"></i></span> <span>Efectivo</span></td>
+                        <td>{{totalEfectivo | customNumber}}</td>
+                        <td><i class="fa-regular fa-circle-dot"></i></td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: #2196F3;"><i class="fa-solid fa-building-columns"></i></span> <span>Transferencias</span></td>
+                        <td>{{totalTransferencia | customNumber}}</td>
                         <td><i class="fa-regular fa-circle-dot"></i></td>
                     </tr>
                     <tr>
@@ -43,9 +53,14 @@
                         <td><span style="color: var(--primary-color-neutro)"><i class="fa-regular fa-object-ungroup"></i></span> <span>Ventas diarias</span></td>
                         <td>{{salesD | customNumber}}</td>
                         <td><i class="fa-regular fa-circle-dot"></i></td>
-                    </tr>   
+                    </tr>
                     <tr>
-                        <td><span style="color: var(--primary-color-neutro)"><i class="fa-solid fa-sack-xmark"></i></span> <span>Total</span></td>
+                        <td><span style="color: #FF9800;"><i class="fa-solid fa-cash-register"></i></span> <span>Efectivo en caja</span></td>
+                        <td>{{efectivoEnCaja | customNumber}}</td>
+                        <td><i class="fa-regular fa-circle-dot"></i></td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: var(--primary-color-neutro)"><i class="fa-solid fa-sack-xmark"></i></span> <span>Balance total</span></td>
                         <td>{{total | customNumber}}</td>
                         <td><i class="fa-regular fa-circle-dot"></i></td>
                     </tr>        

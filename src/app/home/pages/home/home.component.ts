@@ -67,6 +67,9 @@ export class HomeComponent {
   total!: number;
   amount!: number;
   salesD!: number;
+  totalEfectivo!: number;
+  totalTransferencia!: number;
+  efectivoEnCaja!: number;
   token!: string;
   amountID!: number;
   userID!: string;
@@ -101,7 +104,10 @@ export class HomeComponent {
         this.total = resp.balance_diario;
         this.amount = resp.monto_diario;
         this.salesD = resp.cantidad_ventas;
-        this.amountID = resp.monto_id;     
+        this.amountID = resp.monto_id;
+        this.totalEfectivo = resp.total_efectivo || 0;
+        this.totalTransferencia = resp.total_transferencia || 0;
+        this.efectivoEnCaja = resp.efectivo_en_caja || 0;
       })
 
     )
@@ -140,6 +146,9 @@ export class HomeComponent {
               this.bills = resp.total_gastos;
               this.salesD = resp.cantidad_ventas;
               this.total = resp.balance_diario;
+              this.totalEfectivo = resp.total_efectivo || 0;
+              this.totalTransferencia = resp.total_transferencia || 0;
+              this.efectivoEnCaja = resp.efectivo_en_caja || 0;
             },
             (error) => {}
           )
