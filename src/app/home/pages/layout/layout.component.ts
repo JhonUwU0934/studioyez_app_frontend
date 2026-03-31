@@ -19,6 +19,7 @@ export class LayoutComponent {
   isMobile!: boolean; 
   isOpen: boolean = false;
   public usuario: any = {};
+  public esAdmin = false;
 
   sub$! : Subscription;
 
@@ -37,6 +38,7 @@ export class LayoutComponent {
    
     this.sub$ = this.auth.getUsuario.subscribe(usuario => {
       this.usuario = usuario;
+      this.esAdmin = usuario?.rol === 'admin';
     });
 
     this.getScreenSize();

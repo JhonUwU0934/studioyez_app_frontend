@@ -64,6 +64,7 @@ export class AuthService {
             email: resp.user?.email!,
             id: resp.user?.id!,
             name: resp.user?.name!,
+            rol: resp.user?.rol || 'vendedor',
             amount:resp.monto_diario,
             bills:resp.total_gastos,
             sales:resp.total_ventas,
@@ -74,7 +75,7 @@ export class AuthService {
           this.setUsuario = this._usuario;
 
           let UsuarioEncrypt = btoa(this.encryptation.encrypt(JSON.stringify(this._usuario)));
-          
+
           localStorage.setItem('usuario', UsuarioEncrypt);
         
       }),
@@ -108,18 +109,19 @@ export class AuthService {
             email: resp.user?.email!,
             id: resp.user?.id!,
             name: resp.user?.name!,
+            rol: resp.user?.rol || 'vendedor',
             amount:resp.monto_diario,
             bills:resp.total_gastos,
             sales:resp.total_ventas,
             total:resp.balance_diario,
             salesD: resp.cantidad_ventas
           };
-          
+
           this.setUsuario = this._usuario;
 
           let UsuarioEncrypt = btoa(this.encryptation.encrypt(JSON.stringify(this._usuario)));
 
-          localStorage.setItem('usuario', UsuarioEncrypt); 
+          localStorage.setItem('usuario', UsuarioEncrypt);
 
         }
       }),

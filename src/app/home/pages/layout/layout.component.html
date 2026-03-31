@@ -63,28 +63,28 @@
                             </a>
                         </li>
 
-                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                        <li class="nav-link" *ngIf="esAdmin" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
                           <a routerLink="./ingreso-mercancia">
                             <i class="fa-solid fa-plus icon"></i>
                             <span class="text nav-text">Ingreso de mercancía</span>
                           </a>
                       </li>
 
-                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                        <li class="nav-link" *ngIf="esAdmin" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
                             <a routerLink="./historial">
                                 <i class="fa-solid fa-clock-rotate-left icon"></i>
                                 <span class="text nav-text">Historial</span>
                             </a>
                         </li>
 
-                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                        <li class="nav-link" *ngIf="esAdmin" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
                             <a routerLink="./cierres">
                                 <i class="fa-solid fa-chart-bar icon"></i>
                                 <span class="text nav-text">Cierres</span>
                             </a>
                         </li>
 
-                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                        <li class="nav-link" *ngIf="esAdmin" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
                             <a routerLink="./analytics">
                                 <i class="fa-solid fa-chart-line icon"></i>
                                 <span class="text nav-text">Analytics</span>
