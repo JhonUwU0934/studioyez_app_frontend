@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription, Subject, BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, startWith, map, shareReplay } from 'rxjs/operators';
+import { Subscription, Subject, BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, startWith, map, shareReplay, catchError } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { inputModel } from 'src/app/shared/models/input.model';
 import { ApiGetService } from 'src/app/shared/services/api-get.service';
@@ -142,19 +142,29 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
   }
 
   private setupStreams(): void {
-    // Stream para productos filtrados SIN debounce para filtrado en tiempo real
-    this.productosFiltrados$ = combineLatest([
-      this.productos$,
-      this.filtroProductoSubject$.pipe(
-        startWith(''),
-        distinctUntilChanged()
-      )
-    ]).pipe(
-      map(([productos, filtro]) => this.filtrarProductosOptimizado(productos, filtro)),
+    // Stream de productos: debounce 300ms -> búsqueda server-side
+    this.productosFiltrados$ = this.filtroProductoSubject$.pipe(
+      startWith(''),
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(filtro => {
+        if (filtro.trim().length < 2) {
+          return of([] as Producto[]);
+        }
+        const url = `${this.baseUrl}/api/v1/productos/search?q=${encodeURIComponent(filtro)}&limit=20`;
+        const headers = { 'Authorization': this.token };
+        return this.apiGet.getDebtInfo(url, headers).pipe(
+          map((resp: any) => (resp.data || []).map((p: any) => ({
+            ...p,
+            tiene_variantes: (p.variantes_count || 0) > 0
+          }))),
+          catchError(() => of([] as Producto[]))
+        );
+      }),
       shareReplay(1)
     );
 
-    // Stream para variantes filtradas SIN debounce para filtrado en tiempo real
+    // Stream para variantes filtradas (se mantiene client-side, ya es on-demand)
     this.variantesFiltradas$ = combineLatest([
       this.variantes$,
       this.filtroVarianteSubject$.pipe(
@@ -183,23 +193,8 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
     this.subscriptions$.add(
       this.auth.getUsuario.subscribe((usuario) => {
         this.token = 'Bearer ' + usuario.token;
-        this.getProducts();
       })
     );
-  }
-
-  // Métodos de filtrado optimizados
-  private filtrarProductosOptimizado(productos: Producto[], filtro: string): Producto[] {
-    if (!filtro.trim()) {
-      return productos;
-    }
-
-    const filtroLower = filtro.toLowerCase().trim();
-    return productos.filter(producto => {
-      const denominacion = producto.denominacion?.toLowerCase() || '';
-      const codigo = producto.codigo?.toLowerCase() || '';
-      return denominacion.includes(filtroLower) || codigo.includes(filtroLower);
-    });
   }
 
   private filtrarVariantesOptimizado(variantes: ProductoVariante[], filtro: string): ProductoVariante[] {
@@ -225,40 +220,13 @@ export class IngresoMercanciaFormComponent implements OnInit, OnDestroy {
   trackByProductoId = (index: number, producto: Producto): number => producto.id;
   trackByVarianteId = (index: number, variante: ProductoVariante): number => variante.id;
 
-  getProducts(): void {
-    this.loader.setLoader(true);
-    const UrlApi = `${this.baseUrl}/api/v1/productos`;
-    const headers = { 'Authorization': this.token };
-
-    this.subscriptions$.add(
-      this.apiGet.getDebtInfo(UrlApi, headers).subscribe({
-        next: (resp) => {
-          const productos = (resp.data || []).map((producto: Producto) => ({
-            ...producto,
-            tiene_variantes: (producto.variantes_count || 0) > 0
-          }));
-          
-          this.productosSubject$.next(productos);
-          this.loader.setLoader(false);
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          console.error('Error al cargar productos:', error);
-          this.modalService.showError('Error al cargar productos');
-          this.loader.setLoader(false);
-          this.cdr.markForCheck();
-        }
-      })
-    );
-  }
-
   // Métodos de filtrado con respuesta inmediata
   onFiltroProductoChange(filtro: string): void {
     this.filtroProducto = filtro;
     this.filtroProductoSubject$.next(filtro);
     
-    // Abrir dropdown automáticamente al escribir
-    if (filtro.length > 0) {
+    // Abrir dropdown automáticamente al escribir 2+ caracteres
+    if (filtro.length >= 2) {
       this.toggleDropdownProductos(true);
     } else {
       this.toggleDropdownProductos(false);
