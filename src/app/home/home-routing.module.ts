@@ -16,6 +16,7 @@ import { IngresoMercanciaFormComponent } from './pages/ingreso-mercancia-form/in
 import { IngresoMercanciaComponent } from './pages/ingreso-mercancia/ingreso-mercancia.component';
 import { HistorialComponent } from './pages/historial/historial.component';
 import { CierresComponent } from './pages/cierres/cierres.component';
+import { AnalyticsComponent } from './pages/analytics/analytics.component';
 
 
 const routes: Routes = [
@@ -86,6 +87,10 @@ const routes: Routes = [
       {
         path: 'cierres',
         component: CierresComponent,
+      },
+      {
+        path: 'analytics',
+        component: AnalyticsComponent,
       },
       {
         path: '**',

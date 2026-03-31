@@ -1,0 +1,101 @@
+<div class="analytics-container">
+
+  <div class="analytics-header">
+    <h2><i class="fas fa-chart-line"></i> Analytics</h2>
+  </div>
+
+  <div class="loading-state" *ngIf="cargando">
+    <i class="fas fa-spinner fa-spin"></i> Cargando datos...
+  </div>
+
+  <div *ngIf="!cargando">
+
+    <!-- Comparativo mensual resumen -->
+    <div class="comparativo-cards" *ngIf="comparativo">
+      <div class="comp-card">
+        <div class="comp-label">{{ comparativo.mes_actual.nombre }}</div>
+        <div class="comp-value actual">{{ formatMoney(comparativo.mes_actual.total) }}</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-label">{{ comparativo.mes_anterior.nombre }}</div>
+        <div class="comp-value anterior">{{ formatMoney(comparativo.mes_anterior.total) }}</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-label">Diferencia</div>
+        <div class="comp-value" [class.positivo]="comparativo.diferencia >= 0" [class.negativo]="comparativo.diferencia < 0">
+          {{ comparativo.diferencia >= 0 ? '+' : '' }}{{ formatMoney(comparativo.diferencia) }}
+          <span class="porcentaje">({{ comparativo.porcentaje_cambio >= 0 ? '+' : '' }}{{ comparativo.porcentaje_cambio }}%)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grafica comparativo mensual -->
+    <div class="chart-card" *ngIf="lineChartOptions">
+      <apx-chart
+        [series]="lineChartOptions.series!"
+        [chart]="lineChartOptions.chart!"
+        [xaxis]="lineChartOptions.xaxis!"
+        [stroke]="lineChartOptions.stroke!"
+        [dataLabels]="lineChartOptions.dataLabels!"
+        [yaxis]="lineChartOptions.yaxis!"
+        [fill]="lineChartOptions.fill!"
+        [title]="lineChartOptions.title!"
+        [tooltip]="lineChartOptions.tooltip!"
+        [colors]="lineChartOptions.colors!"
+        [legend]="lineChartOptions.legend!"
+      ></apx-chart>
+    </div>
+
+    <!-- Grafica top productos -->
+    <div class="chart-card" *ngIf="barChartOptions">
+      <apx-chart
+        [series]="barChartOptions.series!"
+        [chart]="barChartOptions.chart!"
+        [xaxis]="barChartOptions.xaxis!"
+        [plotOptions]="barChartOptions.plotOptions!"
+        [dataLabels]="barChartOptions.dataLabels!"
+        [colors]="barChartOptions.colors!"
+        [title]="barChartOptions.title!"
+        [tooltip]="barChartOptions.tooltip!"
+        [yaxis]="barChartOptions.yaxis!"
+      ></apx-chart>
+    </div>
+
+    <!-- Detalle top productos con variantes -->
+    <div class="section-card" *ngIf="topProductos.length > 0">
+      <h3><i class="fas fa-trophy"></i> Top 10 - Detalle con variantes</h3>
+
+      <div class="product-ranking" *ngFor="let prod of topProductos; let i = index">
+        <div class="rank-header">
+          <span class="rank-number">#{{ i + 1 }}</span>
+          <div class="rank-info">
+            <strong>{{ prod.denominacion }}</strong>
+            <span class="rank-code">{{ prod.codigo }}</span>
+          </div>
+          <div class="rank-stats">
+            <span class="rank-qty">{{ prod.total_cantidad }} uds</span>
+            <span class="rank-total">{{ formatMoney(prod.total_vendido) }}</span>
+          </div>
+        </div>
+
+        <div class="variantes-list" *ngIf="prod.variantes && prod.variantes.length > 0">
+          <div class="variante-row" *ngFor="let v of prod.variantes">
+            <span class="var-detail">
+              <span *ngIf="v.color">{{ v.color }}</span>
+              <span *ngIf="v.color && v.talla"> / </span>
+              <span *ngIf="v.talla">{{ v.talla }}</span>
+              <span *ngIf="v.sku" class="var-sku">{{ v.sku }}</span>
+            </span>
+            <span class="var-qty">{{ v.cantidad }} uds</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="topProductos.length === 0">
+      <i class="fas fa-chart-pie"></i>
+      <p>No hay datos de ventas este mes</p>
+    </div>
+
+  </div>
+</div>

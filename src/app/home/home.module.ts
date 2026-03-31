@@ -15,12 +15,14 @@ import { BillsComponent } from './pages/bills/bills.component';
 import { BillsFormComponent } from './pages/bills-form/bills-form.component';
 import { ProductsFormComponent } from './pages/products-form/products-form.component';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { NgApexchartsModule } from 'ng-apexcharts';
 import { DevolucionesComponent } from './pages/devoluciones/devoluciones.component';
 import { DevolucionesFormComponent } from './pages/devoluciones-form/devoluciones-form.component';
 import { IngresoMercanciaFormComponent } from './pages/ingreso-mercancia-form/ingreso-mercancia-form.component';
 import { IngresoMercanciaComponent } from './pages/ingreso-mercancia/ingreso-mercancia.component';
 import { HistorialComponent } from './pages/historial/historial.component';
 import { CierresComponent } from './pages/cierres/cierres.component';
+import { AnalyticsComponent } from './pages/analytics/analytics.component';
 import { ProductDetailsModalComponent } from './pages/product-details-modal/product-details-modal.component';
 
 
@@ -43,6 +45,7 @@ import { ProductDetailsModalComponent } from './pages/product-details-modal/prod
     IngresoMercanciaComponent,
     HistorialComponent,
     CierresComponent,
+    AnalyticsComponent,
     ProductDetailsModalComponent
   ],
   imports: [
@@ -52,6 +55,7 @@ import { ProductDetailsModalComponent } from './pages/product-details-modal/prod
     ReactiveFormsModule,
     FormsModule,
     NgxPaginationModule,
+    NgApexchartsModule,
   ]
 })
 export class HomeModule { }

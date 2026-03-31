@@ -1,0 +1,188 @@
+@import '../../../../styles.scss';
+
+.analytics-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.analytics-header {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text, #333);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    i { color: var(--secondary-color-1, #007bff); }
+  }
+}
+
+// Comparativo cards
+.comparativo-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.comp-card {
+  background: white;
+  border-radius: 10px;
+  padding: 18px 22px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .comp-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .comp-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+
+    &.actual { color: #007bff; }
+    &.anterior { color: #adb5bd; }
+    &.positivo { color: #4CAF50; }
+    &.negativo { color: #f44336; }
+
+    .porcentaje {
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+}
+
+// Charts
+.chart-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+// Section
+.section-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h3 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text, #333);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    i { color: #FF9800; }
+  }
+}
+
+// Product ranking
+.product-ranking {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 0;
+
+  &:last-child { border-bottom: none; }
+}
+
+.rank-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rank-number {
+  font-size: 18px;
+  font-weight: 800;
+  color: #007bff;
+  min-width: 32px;
+}
+
+.rank-info {
+  flex: 1;
+
+  strong { display: block; font-size: 14px; color: var(--color-text, #333); }
+  .rank-code { font-size: 11px; color: #999; font-family: monospace; }
+}
+
+.rank-stats {
+  text-align: right;
+
+  .rank-qty {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+  }
+  .rank-total {
+    font-size: 12px;
+    color: #4CAF50;
+    font-weight: 600;
+  }
+}
+
+// Variantes
+.variantes-list {
+  margin-top: 8px;
+  padding-left: 44px;
+}
+
+.variante-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+  color: #777;
+
+  .var-detail {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .var-sku {
+    font-family: monospace;
+    color: #aaa;
+    font-size: 11px;
+  }
+
+  .var-qty {
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60px;
+  color: #888;
+  font-size: 16px;
+  i { margin-right: 8px; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px;
+  color: #aaa;
+  i { font-size: 40px; display: block; margin-bottom: 12px; }
+  p { margin: 0; font-size: 16px; }
+}
+
+@media (max-width: 768px) {
+  .comparativo-cards { grid-template-columns: 1fr; }
+}
