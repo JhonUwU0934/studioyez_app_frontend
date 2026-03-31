@@ -14,6 +14,7 @@ import { DevolucionesComponent } from './pages/devoluciones/devoluciones.compone
 import { DevolucionesFormComponent } from './pages/devoluciones-form/devoluciones-form.component';
 import { IngresoMercanciaFormComponent } from './pages/ingreso-mercancia-form/ingreso-mercancia-form.component';
 import { IngresoMercanciaComponent } from './pages/ingreso-mercancia/ingreso-mercancia.component';
+import { HistorialComponent } from './pages/historial/historial.component';
 
 
 const routes: Routes = [
@@ -76,6 +77,10 @@ const routes: Routes = [
       {
         path: 'ingreso-mercancia-form',
         component: IngresoMercanciaFormComponent,
+      },
+      {
+        path: 'historial',
+        component: HistorialComponent,
       },
       {
         path: '**',

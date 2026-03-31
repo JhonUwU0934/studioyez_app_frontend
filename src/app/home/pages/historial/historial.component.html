@@ -1,0 +1,141 @@
+<div class="historial-container">
+
+  <!-- Header -->
+  <div class="historial-header">
+    <h2><i class="fas fa-history"></i> Historial por Prenda</h2>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab" [class.active]="tabActiva === 'ingresos'" (click)="cambiarTab('ingresos')">
+      <i class="fas fa-box-open"></i> Ingresos
+    </button>
+    <button class="tab" [class.active]="tabActiva === 'ventas'" (click)="cambiarTab('ventas')">
+      <i class="fas fa-shopping-cart"></i> Ventas
+    </button>
+  </div>
+
+  <!-- Buscador -->
+  <div class="search-bar">
+    <i class="fas fa-search"></i>
+    <input type="text" [(ngModel)]="search"
+           [placeholder]="tabActiva === 'ingresos' ? 'Buscar por producto o SKU...' : 'Buscar por producto, comprador o SKU...'"
+           class="search-input">
+    <button *ngIf="search" class="clear-btn" (click)="search = ''">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- TAB INGRESOS -->
+  <div *ngIf="tabActiva === 'ingresos'">
+    <div class="results-count" *ngIf="!cargandoIngresos">
+      {{ ingresosFiltrados.length }} ingreso(s)
+    </div>
+
+    <div class="loading-state" *ngIf="cargandoIngresos">
+      <i class="fas fa-spinner fa-spin"></i> Cargando ingresos...
+    </div>
+
+    <div class="table-responsive" *ngIf="!cargandoIngresos">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Código/SKU</th>
+            <th>Tipo</th>
+            <th style="text-align: center;">Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ingreso of (ingresosFiltrados | paginate: { itemsPerPage: 15, currentPage: pIngresos })">
+            <td class="fecha">{{ formatDate(ingreso.fecha) }}</td>
+            <td class="producto">
+              <strong>{{ ingreso.nombre_completo }}</strong>
+              <span class="variante-badge" *ngIf="ingreso.es_ingreso_de_variante">
+                <i class="fas fa-layer-group"></i> Variante
+              </span>
+            </td>
+            <td class="codigo">{{ ingreso.sku_mostrar }}</td>
+            <td>
+              <span class="tipo-badge" [class.tipo-variante]="ingreso.es_ingreso_de_variante">
+                {{ ingreso.es_ingreso_de_variante ? 'Variante' : 'Producto' }}
+              </span>
+            </td>
+            <td style="text-align: center; font-weight: 700; color: #4CAF50;">
+              +{{ ingreso.cantidad_de_ingreso }}
+            </td>
+          </tr>
+          <tr *ngIf="ingresosFiltrados.length === 0">
+            <td colspan="5" class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>No se encontraron ingresos</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrapper" *ngIf="ingresosFiltrados.length > 15">
+      <pagination-controls (pageChange)="pIngresos = $event" previousLabel="Anterior" nextLabel="Siguiente">
+      </pagination-controls>
+    </div>
+  </div>
+
+  <!-- TAB VENTAS -->
+  <div *ngIf="tabActiva === 'ventas'">
+    <div class="results-count" *ngIf="!cargandoVentas">
+      {{ ventasDetalleFiltradas.length }} venta(s) por prenda
+    </div>
+
+    <div class="loading-state" *ngIf="cargandoVentas">
+      <i class="fas fa-spinner fa-spin"></i> Cargando ventas...
+    </div>
+
+    <div class="table-responsive" *ngIf="!cargandoVentas">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Código/SKU</th>
+            <th style="text-align: center;">Cant.</th>
+            <th style="text-align: right;">Precio unit.</th>
+            <th style="text-align: right;">Total</th>
+            <th>Comprador</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of (ventasDetalleFiltradas | paginate: { id: 'ventasPag', itemsPerPage: 15, currentPage: pVentas })">
+            <td class="fecha">{{ formatDate(v.fecha) }}</td>
+            <td class="producto">
+              <strong>{{ v.producto_nombre }}</strong>
+              <span class="variante-detail" *ngIf="v.color || v.talla">
+                <span *ngIf="v.color">{{ v.color }}</span>
+                <span *ngIf="v.color && v.talla"> / </span>
+                <span *ngIf="v.talla">{{ v.talla }}</span>
+              </span>
+            </td>
+            <td class="codigo">{{ v.sku || v.producto_codigo }}</td>
+            <td style="text-align: center; font-weight: 700;">{{ v.cantidad }}</td>
+            <td style="text-align: right;">{{ formatMoney(v.precio_unitario) }}</td>
+            <td style="text-align: right; font-weight: 700;">{{ formatMoney(v.total_producto) }}</td>
+            <td>{{ v.nombre_comprador }}</td>
+          </tr>
+          <tr *ngIf="ventasDetalleFiltradas.length === 0">
+            <td colspan="7" class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>No se encontraron ventas</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-wrapper" *ngIf="ventasDetalleFiltradas.length > 15">
+      <pagination-controls id="ventasPag" (pageChange)="pVentas = $event" previousLabel="Anterior" nextLabel="Siguiente">
+      </pagination-controls>
+    </div>
+  </div>
+
+</div>

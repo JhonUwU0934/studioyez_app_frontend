@@ -69,6 +69,13 @@
                             <span class="text nav-text">Ingreso de mercancía</span>
                           </a>
                       </li>
+
+                        <li class="nav-link" (click)="isMobile? toggleClose(): ''" routerLinkActive="active">
+                            <a routerLink="./historial">
+                                <i class="fa-solid fa-clock-rotate-left icon"></i>
+                                <span class="text nav-text">Historial</span>
+                            </a>
+                        </li>
                         <!-- <li class="nav-link" routerLinkActive="active">
                             <a routerLink="./inventario">
                                 <i class="fa-solid fa-receipt icon"></i>

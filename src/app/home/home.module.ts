@@ -19,6 +19,7 @@ import { DevolucionesComponent } from './pages/devoluciones/devoluciones.compone
 import { DevolucionesFormComponent } from './pages/devoluciones-form/devoluciones-form.component';
 import { IngresoMercanciaFormComponent } from './pages/ingreso-mercancia-form/ingreso-mercancia-form.component';
 import { IngresoMercanciaComponent } from './pages/ingreso-mercancia/ingreso-mercancia.component';
+import { HistorialComponent } from './pages/historial/historial.component';
 import { ProductDetailsModalComponent } from './pages/product-details-modal/product-details-modal.component';
 
 
@@ -39,6 +40,7 @@ import { ProductDetailsModalComponent } from './pages/product-details-modal/prod
     DevolucionesFormComponent,
     IngresoMercanciaFormComponent,
     IngresoMercanciaComponent,
+    HistorialComponent,
     ProductDetailsModalComponent
   ],
   imports: [
