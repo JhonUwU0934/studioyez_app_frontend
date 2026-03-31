@@ -639,30 +639,27 @@ export class DevolucionesFormComponent {
   }
 
   getSubmit() {
-    const headers = {
-      Authorization: this.token,
-    };
+    const datos = this.obtenerDatosCombinados();
+    if (datos.length === 0) return;
+
+    const headers = { Authorization: this.token };
 
     const paramsBody = {
-      codigo_factura: this.obtenerDatosCombinados()[0].codigo, // Asumiendo que solo hay un código de factura para todos los productos
-      codigo_producto: this.seleccionarProducto(event), // Utilizamos el valor de this.seleccionarProducto(event) como el código del producto
-      cantidad: this.obtenerDatosCombinados().length
+      codigo_factura: datos[0].codigo,
+      codigo_producto: this.productoSeleccionado,
+      cantidad: this.quantities[0] || 1
     };
 
     const UrlApi = `${this.baseUrl}/api/v1/devolucionclientealmacen`;
 
-    const apiObservable = this.apiPost.getDebtInfo(UrlApi, paramsBody, headers);
-
     this.subscriptions$.add(
-      apiObservable.subscribe(
+      this.apiPost.getDebtInfo(UrlApi, paramsBody, headers).subscribe(
         (resp) => {
-          console.log(resp);
           this.buttonService.setCHange(false);
           this.router.navigate(['/home/devolucion']);
         },
         (error) => {
           this.buttonService.setCHange(false);
-          console.log('There has been a problem with your fetch operation:', error);
 
           const newModalData: modalModel = {
             viewModal: true,
@@ -670,7 +667,7 @@ export class DevolucionesFormComponent {
             title: 'Atención',
             colorIcon: 'red',
             icon: 'fa-solid fa-triangle-exclamation',
-            message: error,
+            message: error?.error?.message || error?.error?.error || 'Error al registrar la devolución',
             onMethod: () => {
               newModalData.viewModal = false;
             },
