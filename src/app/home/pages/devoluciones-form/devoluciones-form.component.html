@@ -39,8 +39,8 @@
                     <td>{{data.codigo_factura}}</td>
                     <td>
                       <select class="select-productos" (change)="seleccionarProducto($event)">
-                        <option *ngFor="let item of data.productos" [value]="item.codigo">
-                          {{item.denominacion | textFilter}} {{'Precio: '+ (item.total_producto | customNumber)}} {{'Cantidad:'+item.cantidad}}
+                        <option *ngFor="let item of data.productos" [value]="item.codigo + (item.pivot?.id_producto_variante ? '|' + item.pivot.id_producto_variante : '')">
+                          {{item.denominacion | textFilter}} {{item.pivot?.sku_vendido ? '('+item.pivot.sku_vendido+')' : ''}} {{'Precio: '+ (item.total_producto | customNumber)}} {{'Cant:'+item.cantidad}}
                         </option>
                       </select>
 

@@ -43,7 +43,8 @@ export class DevolucionesFormComponent {
   existProduct: boolean = false;
 
   codigoBuscado: string = '';
-  productoSeleccionado: string = ''; // Asegúrate de declarar la variable productoSeleccionado en tu componente
+  productoSeleccionado: string = '';
+  varianteSeleccionadaId: number | null = null;
 
   cantidadVenta: number = 1;
   multiplicador: number = 2;
@@ -535,7 +536,9 @@ export class DevolucionesFormComponent {
 
         // Establecer productoSeleccionado al primer producto del elemento actualizado
         if (this.VentasFiltrados.length > 0 && this.VentasFiltrados[0].productos.length > 0) {
-          this.productoSeleccionado = this.VentasFiltrados[0].productos[0].codigo;
+          const primerProd = this.VentasFiltrados[0].productos[0];
+          this.productoSeleccionado = primerProd.codigo;
+          this.varianteSeleccionadaId = primerProd.pivot?.id_producto_variante || null;
         }
       } else {
         // Si no existe, limpia VentasFiltrados y agrega el nuevo elemento
@@ -545,7 +548,9 @@ export class DevolucionesFormComponent {
 
         // Establecer productoSeleccionado al primer producto del elemento agregado
         if (this.VentasFiltrados.length > 0 && this.VentasFiltrados[0].productos.length > 0) {
-          this.productoSeleccionado = this.VentasFiltrados[0].productos[0].codigo;
+          const primerProd = this.VentasFiltrados[0].productos[0];
+          this.productoSeleccionado = primerProd.codigo;
+          this.varianteSeleccionadaId = primerProd.pivot?.id_producto_variante || null;
         }
       }
     }
@@ -644,11 +649,14 @@ export class DevolucionesFormComponent {
 
     const headers = { Authorization: this.token };
 
-    const paramsBody = {
+    const paramsBody: any = {
       codigo_factura: datos[0].codigo,
       codigo_producto: this.productoSeleccionado,
       cantidad: this.quantities[0] || 1
     };
+    if (this.varianteSeleccionadaId) {
+      paramsBody.producto_variante_id = this.varianteSeleccionadaId;
+    }
 
     const UrlApi = `${this.baseUrl}/api/v1/devolucionclientealmacen`;
 
@@ -689,13 +697,15 @@ export class DevolucionesFormComponent {
 
 
   seleccionarProducto(event: any) {
-    // Verificamos si event.target existe antes de acceder a su propiedad value
-    const codigo = event.target ? event.target.value : null;
-    if (codigo) {
-      this.productoSeleccionado = codigo;
+    const valor = event.target ? event.target.value : null;
+    if (!valor) return this.productoSeleccionado;
 
-    }
-    return this.productoSeleccionado
+    // El valor viene como "codigo|varianteId" o solo "codigo"
+    const partes = valor.split('|');
+    this.productoSeleccionado = partes[0];
+    this.varianteSeleccionadaId = partes[1] ? parseInt(partes[1]) : null;
+
+    return this.productoSeleccionado;
   }
 
 

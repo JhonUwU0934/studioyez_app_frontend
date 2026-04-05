@@ -20,27 +20,24 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>producto_id</th>
-                            <th>cantidad</th>
-                            <th>código de producto</th>
-                            <th>precio_venta</th>
-                            <th>cliente</th>
-                            <th>fecha</th>
-                            <th>Id quien_recibe</th>
-                            <th></th>
+                            <th>Producto</th>
+                            <th>Código</th>
+                            <th>Cantidad</th>
+                            <th>Precio venta</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Recibido por</th>
                         </tr>
                     </thead>
                     <tbody *ngFor="let data of (data.data | searchSale:'codigo': search  | paginate: { itemsPerPage: 5, currentPage: p })">
                         <tr>
-                            <td>{{data.producto_id}}</td>
+                            <td>{{data.producto_nombre}} <span *ngIf="data.variante_sku" style="font-size:11px; color:#888;">({{data.variante_sku}})</span></td>
+                            <td>{{data.codigo || data.producto_codigo}}</td>
                             <td>{{data.cantidad}}</td>
-                            <td>{{data.codigo}}</td>
                             <td>{{data.precio_venta}}</td>
                             <td>{{data.cliente}}</td>
                             <td>{{data.fecha}}</td>
-                            <td>{{data.quien_recibe}}</td>
-                            <td>{{data.created_at}}</td>
-
+                            <td>{{data.quien_recibe_nombre}}</td>
                         </tr>
                     </tbody>
                 </table>
