@@ -162,12 +162,23 @@
                             <td>
                                 <div class="acciones-cell">
                                     <!-- Botón ver detalle -->
-                                    <button 
+                                    <button
                                         type="button"
                                         class="btn-accion btn-detalle"
                                         (click)="verDetalleIngreso(ingreso)"
                                         title="Ver información detallada">
                                         <i class="fa-solid fa-eye"></i>
+                                    </button>
+
+                                    <!-- Botón eliminar (solo admin) -->
+                                    <button
+                                        *ngIf="esAdmin"
+                                        type="button"
+                                        class="btn-accion btn-detalle"
+                                        style="background: #f44336; color: white;"
+                                        (click)="eliminarIngreso(ingreso)"
+                                        title="Eliminar ingreso (revierte stock)">
+                                        <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
                             </td>

@@ -256,12 +256,23 @@
                                     </button>
 
                                     <!-- Indicador de crédito pagado -->
-                                    <span 
+                                    <span
                                         *ngIf="creditoPagado(data)"
                                         class="credito-pagado-indicator"
                                         title="Crédito ya pagado">
                                         <i class="fa-solid fa-check-circle"></i>
                                     </span>
+
+                                    <!-- Botón eliminar (solo admin) -->
+                                    <button
+                                        *ngIf="esAdmin"
+                                        type="button"
+                                        class="btn-accion btn-detalle"
+                                        style="background: #f44336; color: white;"
+                                        (click)="eliminarVenta(data)"
+                                        title="Eliminar venta (revierte stock)">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>

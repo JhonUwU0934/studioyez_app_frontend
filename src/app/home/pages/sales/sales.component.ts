@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { ApiGetService } from 'src/app/shared/services/api-get.service';
+import { HttpClient } from '@angular/common/http';
 import { ButtonService } from 'src/app/shared/services/button.service';
 import { EncryptationService } from 'src/app/shared/services/encryptation.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';
@@ -105,6 +106,7 @@ export class SalesComponent {
   p: number = 1;
   token!: string;
   search: string = '';
+  esAdmin = false;
 
   private subscriptions$ = new Subscription();
 
@@ -112,8 +114,9 @@ export class SalesComponent {
     this.loader.setLoader(true);
 
     this.subscriptions$.add(
-      this.auth.getUsuario.subscribe(usuario => { 
-        this.token = 'Bearer ' + usuario.token; 
+      this.auth.getUsuario.subscribe(usuario => {
+        this.token = 'Bearer ' + usuario.token;
+        this.esAdmin = usuario?.rol === 'admin';
       })
     );
  
@@ -733,5 +736,54 @@ export class SalesComponent {
    */
   tienePagoMixto(venta: VentaCompleta): boolean {
     return this.tieneCredito(venta) && (this.tieneValorEfectivo(venta) || this.tieneValorTransferencia(venta));
+  }
+
+  eliminarVenta(venta: VentaCompleta): void {
+    const confirmModal: any = {
+      viewModal: true,
+      clickOutside: true,
+      title: 'Eliminar Venta',
+      colorIcon: 'red',
+      icon: 'fa-solid fa-trash',
+      message: `¿Eliminar venta ${venta.codigo_factura}? El stock de los productos se revertirá al inventario. Esta acción queda registrada en auditoría.`,
+      onMethod: () => { confirmModal.viewModal = false; },
+      isThereaButton2: true,
+      onMethodAction: () => {
+        confirmModal.viewModal = false;
+        this.loader.setLoader(true);
+
+        const url = `${this.baseUrl}/api/v1/ventas/${venta.id}`;
+        const headers = new Headers();
+        headers.append('Authorization', this.token);
+
+        fetch(url, { method: 'DELETE', headers })
+          .then(r => r.json())
+          .then(result => {
+            this.loader.setLoader(false);
+            if (result.message) {
+              this.data.data = this.data.data.filter(v => v.id !== venta.id);
+              const okModal: any = {
+                viewModal: true, clickOutside: true,
+                title: 'Venta Eliminada', colorIcon: 'green',
+                icon: 'fa-solid fa-check-circle',
+                message: result.message,
+                onMethod: () => { okModal.viewModal = false; },
+                onMethodAction: () => {}, loader: false, buttonText: 'OK',
+              };
+              this.modalService.setArray(okModal);
+            } else {
+              this.mostrarErrorDetalle(result.error || 'Error al eliminar');
+            }
+          })
+          .catch(() => {
+            this.loader.setLoader(false);
+            this.mostrarErrorDetalle('Error de conexión');
+          });
+      },
+      loader: false,
+      buttonText: 'Cancelar',
+      buttonTextSecondary: 'Sí, eliminar',
+    };
+    this.modalService.setArray(confirmModal);
   }
 }

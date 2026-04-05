@@ -95,6 +95,7 @@ export class IngresoMercanciaComponent {
 
   public data: RespuestaIngresoMercancia = { success: false, data: [] };
   search: string = '';
+  esAdmin = false;
 
   private subscriptions$ = new Subscription();
 
@@ -104,6 +105,7 @@ export class IngresoMercanciaComponent {
     this.subscriptions$.add(
       this.auth.getUsuario.subscribe(usuario => {
         this.token = 'Bearer ' + usuario.token;
+        this.esAdmin = usuario?.rol === 'admin';
         this.cargarIngresos();
       })
     );
@@ -452,5 +454,54 @@ export class IngresoMercanciaComponent {
    */
   hayIngresos(): boolean {
     return this.data.data && this.data.data.length > 0;
+  }
+
+  eliminarIngreso(ingreso: IngresoMercancia): void {
+    const confirmModal: any = {
+      viewModal: true,
+      clickOutside: true,
+      title: 'Eliminar Ingreso',
+      colorIcon: 'red',
+      icon: 'fa-solid fa-trash',
+      message: `¿Eliminar ingreso #${ingreso.codigo}? Se descontarán ${ingreso.cantidad_de_ingreso} unidades del inventario. Esta acción queda registrada en auditoría.`,
+      onMethod: () => { confirmModal.viewModal = false; },
+      isThereaButton2: true,
+      onMethodAction: () => {
+        confirmModal.viewModal = false;
+        this.loader.setLoader(true);
+
+        const url = `${this.baseUrl}/api/v1/ingresodemercancia/${ingreso.id}`;
+        const headers = new Headers();
+        headers.append('Authorization', this.token);
+
+        fetch(url, { method: 'DELETE', headers })
+          .then(r => r.json())
+          .then(result => {
+            this.loader.setLoader(false);
+            if (result.success) {
+              this.data.data = this.data.data.filter(i => i.id !== ingreso.id);
+              const okModal: any = {
+                viewModal: true, clickOutside: true,
+                title: 'Ingreso Eliminado', colorIcon: 'green',
+                icon: 'fa-solid fa-check-circle',
+                message: result.message,
+                onMethod: () => { okModal.viewModal = false; },
+                onMethodAction: () => {}, loader: false, buttonText: 'OK',
+              };
+              this.modalService.setArray(okModal);
+            } else {
+              this.mostrarError(result.error || result.message || 'Error al eliminar');
+            }
+          })
+          .catch(() => {
+            this.loader.setLoader(false);
+            this.mostrarError('Error de conexión');
+          });
+      },
+      loader: false,
+      buttonText: 'Cancelar',
+      buttonTextSecondary: 'Sí, eliminar',
+    };
+    this.modalService.setArray(confirmModal);
   }
 }
