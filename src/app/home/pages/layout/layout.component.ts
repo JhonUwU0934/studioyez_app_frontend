@@ -37,7 +37,7 @@ export class LayoutComponent {
   ngOnInit(): void {
    
     this.sub$ = this.auth.getUsuario.subscribe(usuario => {
-      this.usuario = usuario;
+      this.usuario = usuario || {};
       this.esAdmin = usuario?.rol === 'admin';
     });
 

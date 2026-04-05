@@ -201,6 +201,7 @@ export class AuthService {
       isThereaButton2:true,
       onMethodAction: () => {
         localStorage.removeItem('usuario');
+        this._usuarioSubject.next(null);
 
         newModalData.viewModal = false;
         this.router.navigate(['/auth/login']);
